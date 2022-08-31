@@ -2,14 +2,14 @@
 
 ## About
 
-This project is the Microsoft Energy Data Services (MEDS) Power BI connector. The connector is used to query data from your MEDS instance and display it in Power BI reports.
+This project is the Microsoft Energy Data Services (MEDS) Power BI connector. The connector is used to query data from a MEDS instance and display it in Power BI reports.
 
 ## Development Machine Setup
 
 You will need Visual Studio 2019 and the Power Query SDK to compile the project.
 
 1. Install Visual Studio 2019
-1. Install the Power Query SDK from the Visual Studio Marketplace
+1. Install the [Power Query SDK](https://marketplace.visualstudio.com/items?itemName=Dakahn.PowerQuerySDK) from the Visual Studio Marketplace
 
 ## Testing the Connector
 To test the connector you must configure your MEDS instance, and connector first.
@@ -21,7 +21,7 @@ Add the below URI as a Single Page Application (SPA) redirect URI to your AD App
 
 ### Configuring the Connector
 
-Provide a client ID, tenant ID, MEDS instance name, and data partition ID in [MicrosoftEnergyDataServices.query.pq](MicrosoftEnergyDataServices\MicrosoftEnergyDataServices\MicrosoftEnergyDataServices.query.pq). Once this is done, you can run the connector by pressing the Run button or F5.
+Provide a client ID, tenant ID, MEDS instance name, and data partition ID in [MicrosoftEnergyDataServices.query.pq](./MicrosoftEnergyDataServices/MicrosoftEnergyDataServices/MicrosoftEnergyDataServices.query.pq). Once this is done, you can run the connector by pressing the Run button or F5.
 
 ## Contributing
 
