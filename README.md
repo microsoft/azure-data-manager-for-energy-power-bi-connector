@@ -1,14 +1,27 @@
-# Project
+# Microsoft Energy Data Services Power BI Connector
 
-> This repo has been populated by an initial template to help get you started. Please
-> make sure to update the content to build a great experience for community-building.
+## About
 
-As the maintainer of this project, please make a few updates:
+This project is the Microsoft Energy Data Services (MEDS) Power BI connector. The connector is used to query data from your MEDS instance and display it in Power BI reports.
 
-- Improving this README.MD file to provide a great experience
-- Updating SUPPORT.MD with content about this project's support experience
-- Understanding the security reporting process in SECURITY.MD
-- Remove this section from the README
+## Development Machine Setup
+
+You will need Visual Studio 2019 and the Power Query SDK to compile the project.
+
+1. Install Visual Studio 2019
+1. Install the Power Query SDK from the Visual Studio Marketplace
+
+## Testing the Connector
+To test the connector you must configure your MEDS instance, and connector first.
+
+### Configuring MEDS
+Add the below URI as a Single Page Application (SPA) redirect URI to your AD Application
+
+    https://oauth.powerbi.com/views/oauthredirect.html
+
+### Configuring the Connector
+
+Provide a client ID, tenant ID, MEDS instance name, and data partition ID in [MicrosoftEnergyDataServices.query.pq](MicrosoftEnergyDataServices\MicrosoftEnergyDataServices\MicrosoftEnergyDataServices.query.pq). Once this is done, you can run the connector by pressing the Run button or F5.
 
 ## Contributing
 
@@ -23,6 +36,7 @@ provided by the bot. You will only need to do this once across all repos using o
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
 
 ## Trademarks
 
