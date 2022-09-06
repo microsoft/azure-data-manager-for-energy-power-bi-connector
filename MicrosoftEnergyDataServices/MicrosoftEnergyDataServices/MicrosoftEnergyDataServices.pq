@@ -17,14 +17,28 @@ shared MicrosoftEnergyDataServices.Contents = (clientId as text,
                                       optional offset as number, 
                                       optional returnedFields as text) =>
     let
-            body = GetQueryString(kind, query, limit, offset, returnedFields),
-            Source = Json.Document(Web.Contents(endpoint,[
-                Headers = [#"Content-Type"="application/json", #"data-partition-id"=dataPartition],
-                Content = Text.ToBinary(body)
-             ]  
-           ))
+        results = GetSearchResults(endpoint, dataPartition, kind, query, limit, offset, returnedFields)
     in
-        Source;
+        List.Count(results[results]);
+
+GetSearchResults = (endpoint as text,
+                    dataPartition as text,
+                    kind as text, 
+                    query as text,
+                    optional limit as number, 
+                    optional offset as number, 
+                    optional returnedFields as text) =>
+    
+    let
+        body = GetQueryString(kind, query, limit, offset, returnedFields),
+        results = Json.Document(Web.Contents(endpoint,[
+            Headers = [#"Content-Type"="application/json", #"data-partition-id"=dataPartition],
+            Content = Text.ToBinary(body)
+            ]
+       ))
+    in
+        results;
+
 
 // Data Source Kind description
 MicrosoftEnergyDataServices = [
@@ -176,3 +190,25 @@ GetQueryString = (kind as text, query as text, optional limit as number, optiona
         queryText = "{""kind"": """ & kind & """,""query"": """ & query & """" & ValueNumber.IfNull(limit, "", "limit") & ValueNumber.IfNull(offset, "", "offset") & ValueText.IfNullOrEmpty(returnedFields, "", "returnedFields") & "}"
     in
         queryText;
+
+
+Table.GenerateByPage = (getNextPage as function) as table =>
+    let        
+        listOfPages = List.Generate(
+            () => getNextPage(null),            // get the first page of data
+            (lastPage) => lastPage <> null,     // stop when the function returns null
+            (lastPage) => getNextPage(lastPage) // pass the previous page to the next function call
+        ),
+        // concatenate the pages together
+        tableOfPages = Table.FromList(listOfPages, Splitter.SplitByNothing(), {"Column1"}),
+        firstRow = tableOfPages{0}?
+    in
+        // if we didn't get back any pages of data, return an empty table
+        // otherwise set the table type based on the columns of the first page
+        if (firstRow = null) then
+            Table.FromRows({})
+        else        
+            Value.ReplaceType(
+                Table.ExpandTableColumn(tableOfPages, "Column1", Table.ColumnNames(firstRow[Column1])),
+                Value.Type(firstRow[Column1])
+            );
