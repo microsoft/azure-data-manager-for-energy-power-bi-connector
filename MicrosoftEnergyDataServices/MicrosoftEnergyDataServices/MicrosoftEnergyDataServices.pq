@@ -5,7 +5,7 @@ section MicrosoftEnergyDataServices;
 
 redirectUri = "https://oauth.powerbi.com/views/oauthredirect.html"; // Must be a platform that supports PKCE
 logoutUri = "https://login.microsoftonline.com/logout.srf";
-
+pageSize = 100;
 [DataSource.Kind="MicrosoftEnergyDataServices", Publish="MicrosoftEnergyDataServices.Publish"]
 shared MicrosoftEnergyDataServices.Contents = (clientId as text, 
                                       tenantId as text, 
@@ -19,7 +19,7 @@ shared MicrosoftEnergyDataServices.Contents = (clientId as text,
     let
         results = GetSearchResults(endpoint, dataPartition, kind, query, limit, offset, returnedFields)
     in
-        List.Count(results[results]);
+        results;
 
 GetSearchResults = (endpoint as text,
                     dataPartition as text,
@@ -28,17 +28,39 @@ GetSearchResults = (endpoint as text,
                     optional limit as number, 
                     optional offset as number, 
                     optional returnedFields as text) =>
-    
+    Table.GenerateByPage(
+        (previous) =>
+            let
+                nextPage = if previous = null then 0
+                     else Value.Metadata(previous)[startPosition],
+                totalItems = if previous = null then 1
+                     else Value.Metadata(previous)[totalNumberOfItems],
+                isZerothPage = if previous = null then true
+                     else false,
+                table = if (not isZerothPage) and nextPage > totalItems then null
+                     else GetSearchResultPage(endpoint, dataPartition, kind, query, limit, nextPage, returnedFields)
+            in
+                table);
+
+GetSearchResultPage = (endpoint as text,
+                    dataPartition as text,
+                    kind as text, 
+                    query as text,
+                    optional limit as number, 
+                    optional startPosition as number, 
+                    optional returnedFields as text) =>
     let
-        body = GetQueryString(kind, query, limit, offset, returnedFields),
+        body = GetQueryString(kind, query, pageSize, startPosition, returnedFields),
         results = Json.Document(Web.Contents(endpoint,[
             Headers = [#"Content-Type"="application/json", #"data-partition-id"=dataPartition],
             Content = Text.ToBinary(body)
-            ]
-       ))
+       ])),
+       resultTable = Table.FromList(results[results], Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+       totalNumberOfItems = results[totalCount],
+       nextStart = if List.IsEmpty(results[results]) then 0
+             else startPosition + pageSize
     in
-        results;
-
+        resultTable meta [startPosition = nextStart, totalNumberOfItems = totalNumberOfItems];
 
 // Data Source Kind description
 MicrosoftEnergyDataServices = [

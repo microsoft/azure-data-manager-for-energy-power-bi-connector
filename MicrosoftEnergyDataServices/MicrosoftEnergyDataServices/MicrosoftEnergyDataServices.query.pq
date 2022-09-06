@@ -6,7 +6,6 @@ let
                                          "https://platform4832.energy.azure.com/api/search/v2/query",
                                          "platform4832-opendes",
                                          "osdu:wks:master-data--Wellbore:1.0.0",
-                                         "*",
-                                         2002)
+                                         "*")
 in
     result
