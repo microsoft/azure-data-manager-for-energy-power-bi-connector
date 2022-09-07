@@ -15,13 +15,12 @@ shared MicrosoftEnergyDataServices.Contents = (clientId as text,
                                       kind as text, 
                                       query as text,
                                       optional limit as number, 
-                                      optional offset as number, 
                                       optional returnedFields as text) =>
     let
-        results = GetSearchResults(endpoint, dataPartition, kind, query, limit, offset, returnedFields),
+        results = GetSearchResults(endpoint, dataPartition, kind, query, limit, returnedFields),
         totalRecordCount = GetTotalRecordCount(endpoint, dataPartition, kind, query, returnedFields)
     in
-        [totalCount = totalRecordCount, results = results];
+        [totalCount = totalRecordCount, results = results, listcount = Table.RowCount(results)];
 
 GetTotalRecordCount = (endpoint as text,
                         dataPartition as text,
@@ -29,57 +28,64 @@ GetTotalRecordCount = (endpoint as text,
                         query as text,
                         optional returnedFields as text) as number => 
     let
-        page = GetSearchResultPage(endpoint, dataPartition, kind, query, 1, 0, returnedFields)
+        page = GetSearchResultPage(endpoint, dataPartition, kind, query, 0, 1, 0, returnedFields)
     in
-        Value.Metadata(page)[totalNumberOfItems];
+        Value.Metadata(page)[totalNumberOfRecords];
 
 GetSearchResults = (endpoint as text,
                     dataPartition as text,
                     kind as text, 
                     query as text,
                     optional limit as number, 
-                    optional offset as number, 
                     optional returnedFields as text) =>
     Table.GenerateByPage(
         (previous) =>
             let
                 nextPageStartingPosition = if previous = null then 0
                      else Value.Metadata(previous)[startPosition],
-                totalItems = if previous = null then 1
-                     else Value.Metadata(previous)[totalNumberOfItems],
-                isFirstPage = if previous = null then true
-                     else false,
-                table = if (not isFirstPage) and nextPageStartingPosition >= totalItems then null
-                     else GetSearchResultPage(endpoint, dataPartition, kind, query, limit, nextPageStartingPosition, returnedFields)
+                runningCountOfRetrievedRecords = if previous = null then 0
+                    else Value.Metadata(previous)[runningCountOfRetrievedRecords],
+                table = if RetrievedAllPages(previous, limit) then null
+                     else GetSearchResultPage(endpoint, dataPartition, kind, query, runningCountOfRetrievedRecords, limit, nextPageStartingPosition, returnedFields)
             in
                 table);
 
 GetSearchResultPage = (endpoint as text,
-                    dataPartition as text,
-                    kind as text, 
-                    query as text,
-                    optional limit as number, 
-                    optional startPosition as number, 
-                    optional returnedFields as text) =>
+                        dataPartition as text,
+                        kind as text, 
+                        query as text,
+                        runningCountOfRetrievedRecords as number,
+                        limit as number, 
+                        startPosition as number, 
+                        optional returnedFields as text) =>
     let
+        //adjustedLimit = AdjustPageSizeDependingOnUsersLimit(limit, pageSize, runningCountOfRetrievedRecords),
         body = GetQueryString(kind, query, pageSize, startPosition, returnedFields),
         results = Json.Document(Web.Contents(endpoint,[
             Headers = [#"Content-Type"="application/json", #"data-partition-id"=dataPartition],
             Content = Text.ToBinary(body)
        ])),
-       resultTable = Table.FromList(results[results], Splitter.SplitByNothing(), null, null, ExtraValues.Error),
-       totalNumberOfItems = results[totalCount],
+       totalNumberOfRecords = results[totalCount],
        nextStart = if List.IsEmpty(results[results]) then 0
-             else startPosition + pageSize
+             else startPosition + pageSize,
+       updatedCount = List.Count(results[results]) + runningCountOfRetrievedRecords,
+       resultTable = Table.FromList(results[results], Splitter.SplitByNothing(), null, null, ExtraValues.Error)
     in
-        resultTable meta [startPosition = nextStart, totalNumberOfItems = totalNumberOfItems];
+       resultTable meta [startPosition = nextStart, totalNumberOfRecords = totalNumberOfRecords, runningCountOfRetrievedRecords = updatedCount];
 
-IsThereMoreDataTopage = () => 
+RetrievedAllPages = (previousPage, limit as number) => 
     let 
-        x = false
+        isFirstPage = if previousPage = null then true else false,
+        collectedItems = Value.Metadata(previousPage)[runningCountOfRetrievedRecords],
+        totalItems = Value.Metadata(previousPage)[totalNumberOfRecords]
     in
-        x;
+        (not isFirstPage) and (/*collectedItems = limit or */collectedItems = totalItems);
 
+// AdjustPageSizeDependingOnUsersLimit = (limit as number, pageSize as number, runningCountOfRetrievedRecords as number) as number =>
+//     let 
+//         adjustedLimit = if (runningCountOfRetrievedRecords + pageSize) > limit then limit - pageSize else pageSize
+//     in
+//         adjustedLimit;
 
 // Data Source Kind description
 MicrosoftEnergyDataServices = [
