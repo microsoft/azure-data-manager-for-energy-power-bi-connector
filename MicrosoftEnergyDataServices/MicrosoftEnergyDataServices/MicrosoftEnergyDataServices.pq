@@ -6,6 +6,7 @@ section MicrosoftEnergyDataServices;
 redirectUri = "https://oauth.powerbi.com/views/oauthredirect.html"; // Must be a platform that supports PKCE
 logoutUri = "https://login.microsoftonline.com/logout.srf";
 pageSize = 100;
+
 [DataSource.Kind="MicrosoftEnergyDataServices", Publish="MicrosoftEnergyDataServices.Publish"]
 shared MicrosoftEnergyDataServices.Contents = (clientId as text, 
                                       tenantId as text, 
@@ -17,9 +18,20 @@ shared MicrosoftEnergyDataServices.Contents = (clientId as text,
                                       optional offset as number, 
                                       optional returnedFields as text) =>
     let
-        results = GetSearchResults(endpoint, dataPartition, kind, query, limit, offset, returnedFields)
+        results = GetSearchResults(endpoint, dataPartition, kind, query, limit, offset, returnedFields),
+        totalRecordCount = GetTotalRecordCount(endpoint, dataPartition, kind, query, returnedFields)
     in
-        results;
+        [totalCount = totalRecordCount, results = results];
+
+GetTotalRecordCount = (endpoint as text,
+                        dataPartition as text,
+                        kind as text, 
+                        query as text,
+                        optional returnedFields as text) as number => 
+    let
+        page = GetSearchResultPage(endpoint, dataPartition, kind, query, 1, 0, returnedFields)
+    in
+        Value.Metadata(page)[totalNumberOfItems];
 
 GetSearchResults = (endpoint as text,
                     dataPartition as text,
@@ -31,14 +43,14 @@ GetSearchResults = (endpoint as text,
     Table.GenerateByPage(
         (previous) =>
             let
-                nextPage = if previous = null then 0
+                nextPageStartingPosition = if previous = null then 0
                      else Value.Metadata(previous)[startPosition],
                 totalItems = if previous = null then 1
                      else Value.Metadata(previous)[totalNumberOfItems],
-                isZerothPage = if previous = null then true
+                isFirstPage = if previous = null then true
                      else false,
-                table = if (not isZerothPage) and nextPage > totalItems then null
-                     else GetSearchResultPage(endpoint, dataPartition, kind, query, limit, nextPage, returnedFields)
+                table = if (not isFirstPage) and nextPageStartingPosition >= totalItems then null
+                     else GetSearchResultPage(endpoint, dataPartition, kind, query, limit, nextPageStartingPosition, returnedFields)
             in
                 table);
 
@@ -61,6 +73,13 @@ GetSearchResultPage = (endpoint as text,
              else startPosition + pageSize
     in
         resultTable meta [startPosition = nextStart, totalNumberOfItems = totalNumberOfItems];
+
+IsThereMoreDataTopage = () => 
+    let 
+        x = false
+    in
+        x;
+
 
 // Data Source Kind description
 MicrosoftEnergyDataServices = [
@@ -101,33 +120,33 @@ MicrosoftEnergyDataServices.Icons = [
     Icon32 = { Extension.Contents("MicrosoftEnergyDataServices32.png"), Extension.Contents("MicrosoftEnergyDataServices40.png"), Extension.Contents("MicrosoftEnergyDataServices48.png"), Extension.Contents("MicrosoftEnergyDataServices64.png") }
 ];
 
-Base64UrlEncode = (toConvert as binary) =>
+Base64UrlEncode = (toConvert as binary) as text =>
 	let
 		encodedText = Binary.ToText(toConvert, BinaryEncoding.Base64)
 	in
 		Text.Remove(Text.Replace(Text.Replace(encodedText, "+", "-"), "/", "_"), "=");
 
-CreateCodeChallenge = (codeVerifier as text) => 
+CreateCodeChallenge = (codeVerifier as text) as text => 
     let 
         encodedText = Text.ToBinary(codeVerifier, TextEncoding.Ascii),
         challenge = Base64UrlEncode(Crypto.CreateHash(CryptoAlgorithm.SHA256, encodedText))
     in
         challenge;
 
-GetScopes = (clientId as text) =>
+GetScopes = (clientId as text) as text =>
     let
         scopes = "openid profile offline_access " & clientId & "/.default"
     in 
         scopes;
 
-GetClientId = (queryParameters as text) => 
+GetClientId = (queryParameters as text) as text => 
     let
         jsonQueryParameters = Json.Document(queryParameters),
         clientId = jsonQueryParameters[clientId]        
     in
         clientId;
 
-GetAuthenticationBaseUrl = (queryParameters as text) => 
+GetAuthenticationBaseUrl = (queryParameters as text) as text => 
     let 
         jsonQueryParameters = Json.Document(queryParameters),
         tenantId = jsonQueryParameters[tenantId],
