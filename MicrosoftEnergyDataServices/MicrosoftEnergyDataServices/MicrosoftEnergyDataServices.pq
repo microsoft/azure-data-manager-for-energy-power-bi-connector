@@ -6,6 +6,7 @@ section MicrosoftEnergyDataServices;
 redirectUri = "https://oauth.powerbi.com/views/oauthredirect.html"; // Must be a platform that supports PKCE
 logoutUri = "https://login.microsoftonline.com/logout.srf";
 pageSize = 100;
+edsDefaultLimitSizeWhenZeroRequested = 10;
 
 [DataSource.Kind="MicrosoftEnergyDataServices", Publish="MicrosoftEnergyDataServices.Publish"]
 shared MicrosoftEnergyDataServices.Contents = (clientId as text, 
@@ -17,10 +18,22 @@ shared MicrosoftEnergyDataServices.Contents = (clientId as text,
                                       optional limit as number, 
                                       optional returnedFields as text) =>
     let
+        limit = OverrideLimitIfZeroRequested(limit),
         results = GetSearchResults(endpoint, dataPartition, kind, query, limit, returnedFields),
         totalRecordCount = GetTotalRecordCount(endpoint, dataPartition, kind, query, returnedFields)
     in
         [totalCount = totalRecordCount, results = results, listcount = Table.RowCount(results)];
+
+// Microsoft Energy Data Services will default the page size to 10 if the user requested 0.......we should just depend on their logic then...fix connector
+OverrideLimitIfZeroRequested = (optional limit as number) =>
+    let 
+        adjustedLimit = 
+            if not (limit = null) and limit = 0 then 
+                edsDefaultLimitSizeWhenZeroRequested
+            else
+                limit
+    in
+        adjustedLimit;
 
 GetTotalRecordCount = (endpoint as text,
                         dataPartition as text,
@@ -28,7 +41,10 @@ GetTotalRecordCount = (endpoint as text,
                         query as text,
                         optional returnedFields as text) as number => 
     let
-        page = GetSearchResultPage(endpoint, dataPartition, kind, query, 0, 1, 0, returnedFields)
+        startPosition = 0,
+        limit = 1,
+        runningCount = 0,
+        page = GetSearchResultPage(endpoint, dataPartition, kind, query, runningCount, startPosition, limit, returnedFields)
     in
         Value.Metadata(page)[totalNumberOfRecords];
 
@@ -46,7 +62,7 @@ GetSearchResults = (endpoint as text,
                 runningCountOfRetrievedRecords = if previous = null then 0
                     else Value.Metadata(previous)[runningCountOfRetrievedRecords],
                 table = if RetrievedAllPages(previous, limit) then null
-                     else GetSearchResultPage(endpoint, dataPartition, kind, query, runningCountOfRetrievedRecords, limit, nextPageStartingPosition, returnedFields)
+                     else GetSearchResultPage(endpoint, dataPartition, kind, query, runningCountOfRetrievedRecords, nextPageStartingPosition, limit, returnedFields)
             in
                 table);
 
@@ -55,12 +71,12 @@ GetSearchResultPage = (endpoint as text,
                         kind as text, 
                         query as text,
                         runningCountOfRetrievedRecords as number,
-                        limit as number, 
                         startPosition as number, 
+                        optional limit as number, 
                         optional returnedFields as text) =>
     let
-        //adjustedLimit = AdjustPageSizeDependingOnUsersLimit(limit, pageSize, runningCountOfRetrievedRecords),
-        body = GetQueryString(kind, query, pageSize, startPosition, returnedFields),
+        adjustedLimit = AdjustPageSizeDependingOnUsersLimit(pageSize, runningCountOfRetrievedRecords, limit),
+        body = GetQueryString(kind, query, adjustedLimit, startPosition, returnedFields),
         results = Json.Document(Web.Contents(endpoint,[
             Headers = [#"Content-Type"="application/json", #"data-partition-id"=dataPartition],
             Content = Text.ToBinary(body)
@@ -73,19 +89,37 @@ GetSearchResultPage = (endpoint as text,
     in
        resultTable meta [startPosition = nextStart, totalNumberOfRecords = totalNumberOfRecords, runningCountOfRetrievedRecords = updatedCount];
 
-RetrievedAllPages = (previousPage, limit as number) => 
+RetrievedAllPages = (previousPage, optional limit as number) => 
     let 
         isFirstPage = if previousPage = null then true else false,
         collectedItems = Value.Metadata(previousPage)[runningCountOfRetrievedRecords],
-        totalItems = Value.Metadata(previousPage)[totalNumberOfRecords]
+        totalItems = Value.Metadata(previousPage)[totalNumberOfRecords],
+        didRetrievedAll = 
+            if isFirstPage then // We haven't retrieved any pages yet
+                false
+            else
+                if collectedItems = totalItems then // Retrieved all records, regardless of user's limit
+                    true
+                else if not (limit = null) and collectedItems = limit then // User specified limit and we retrieved that many records
+                    true
+                else // We have more records to retrieve beause we haven't retrieved them all yet, or we haven't reached the user's optional limit
+                    false
     in
-        (not isFirstPage) and (/*collectedItems = limit or */collectedItems = totalItems);
+        didRetrievedAll;
 
-// AdjustPageSizeDependingOnUsersLimit = (limit as number, pageSize as number, runningCountOfRetrievedRecords as number) as number =>
-//     let 
-//         adjustedLimit = if (runningCountOfRetrievedRecords + pageSize) > limit then limit - pageSize else pageSize
-//     in
-//         adjustedLimit;
+AdjustPageSizeDependingOnUsersLimit = (pageSize as number, runningCountOfRetrievedRecords as number, optional limit as number) as number =>
+    let 
+        adjustedLimit = 
+            if limit = null then 
+                pageSize
+            else
+                if pageSize > limit // Limit is less than page size
+                    then limit  
+                else if (runningCountOfRetrievedRecords + pageSize) > limit // Limit is more than the page size, but need a partial page to reach limit
+                    then limit - pageSize 
+                else pageSize // Get an entire page
+    in
+        adjustedLimit;
 
 // Data Source Kind description
 MicrosoftEnergyDataServices = [
