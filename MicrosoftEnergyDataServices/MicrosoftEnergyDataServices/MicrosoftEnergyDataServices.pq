@@ -9,7 +9,7 @@ pageSize = 100;
 edsDefaultLimitSizeWhenZeroRequested = 10;
 
 [DataSource.Kind="MicrosoftEnergyDataServices", Publish="MicrosoftEnergyDataServices.Publish"]
-shared MicrosoftEnergyDataServices.Contents = (clientId as text, 
+shared MicrosoftEnergyDataServices.Search = (clientId as text, 
                                       tenantId as text, 
                                       endpoint as text, 
                                       dataPartition as text,
@@ -119,7 +119,7 @@ MicrosoftEnergyDataServices = [
             kind = json[kind],
             query = json[query]
         in
-            { "MicrosoftEnergyDataServices.Contents", clientId, tenantId, endpoint, dataPartition, kind, query },
+            { "MicrosoftEnergyDataServices.Search", clientId, tenantId, endpoint, dataPartition, kind, query },
     Authentication = [
         OAuth = [
             StartLogin=StartLogin,
