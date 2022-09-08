@@ -103,7 +103,7 @@ AdjustPageSizeDependingOnUsersLimit = (pageSize as number, runningCountOfRetriev
                 if pageSize > limit // User wants less than the page size
                     then limit  
                 else if (runningCountOfRetrievedRecords + pageSize) > limit // Limit is more than the page size, but need a partial page to reach limit on the final page
-                    then Number.Mod(limit - pageSize, pageSize)
+                    then Number.Mod(limit - pageSize, pageSize) // Mod in case limit - page size is greater than page size
                 else pageSize // Get an entire page
     in
         adjustedLimit;
