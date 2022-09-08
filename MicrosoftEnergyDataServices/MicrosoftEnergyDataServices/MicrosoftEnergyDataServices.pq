@@ -18,33 +18,20 @@ shared MicrosoftEnergyDataServices.Contents = (clientId as text,
                                       optional limit as number, 
                                       optional returnedFields as text) =>
     let
-        limit = OverrideLimitIfZeroRequested(limit),
         results = GetSearchResults(endpoint, dataPartition, kind, query, limit, returnedFields),
-        totalRecordCount = GetTotalRecordCount(endpoint, dataPartition, kind, query, returnedFields)
+        totalRecordCount = GetTotalRecordCount(endpoint, dataPartition, kind, query)
     in
         [totalCount = totalRecordCount, results = results, listcount = Table.RowCount(results)];
-
-// Microsoft Energy Data Services will default the page size to 10 if the user requested 0.......we should just depend on their logic then...fix connector
-OverrideLimitIfZeroRequested = (optional limit as number) =>
-    let 
-        adjustedLimit = 
-            if not (limit = null) and limit = 0 then 
-                edsDefaultLimitSizeWhenZeroRequested
-            else
-                limit
-    in
-        adjustedLimit;
 
 GetTotalRecordCount = (endpoint as text,
                         dataPartition as text,
                         kind as text, 
-                        query as text,
-                        optional returnedFields as text) as number => 
+                        query as text) as number => 
     let
         startPosition = 0,
         limit = 1,
         runningCount = 0,
-        page = GetSearchResultPage(endpoint, dataPartition, kind, query, runningCount, startPosition, limit, returnedFields)
+        page = GetSearchResultPage(endpoint, dataPartition, kind, query, runningCount, startPosition, limit)
     in
         Value.Metadata(page)[totalNumberOfRecords];
 
@@ -61,7 +48,7 @@ GetSearchResults = (endpoint as text,
                      else Value.Metadata(previous)[startPosition],
                 runningCountOfRetrievedRecords = if previous = null then 0
                     else Value.Metadata(previous)[runningCountOfRetrievedRecords],
-                table = if RetrievedAllPages(previous, limit) then null
+                table = if RetrievedAllPages(previous, limit) then null // Returning null stops the pagination function
                      else GetSearchResultPage(endpoint, dataPartition, kind, query, runningCountOfRetrievedRecords, nextPageStartingPosition, limit, returnedFields)
             in
                 table);
@@ -100,7 +87,7 @@ RetrievedAllPages = (previousPage, optional limit as number) =>
             else
                 if collectedItems = totalItems then // Retrieved all records, regardless of user's limit
                     true
-                else if not (limit = null) and collectedItems = limit then // User specified limit and we retrieved that many records
+                else if not (limit = null) and collectedItems >= limit then // User specified limit and we retrieved that many records. Using >= comparison in case user specified 0 limit - EDS will default to 10 in that case
                     true
                 else // We have more records to retrieve beause we haven't retrieved them all yet, or we haven't reached the user's optional limit
                     false
@@ -113,15 +100,14 @@ AdjustPageSizeDependingOnUsersLimit = (pageSize as number, runningCountOfRetriev
             if limit = null then 
                 pageSize
             else
-                if pageSize > limit // Limit is less than page size
+                if pageSize > limit // User wants less than the page size
                     then limit  
-                else if (runningCountOfRetrievedRecords + pageSize) > limit // Limit is more than the page size, but need a partial page to reach limit
-                    then limit - pageSize 
+                else if (runningCountOfRetrievedRecords + pageSize) > limit // Limit is more than the page size, but need a partial page to reach limit on the final page
+                    then Number.Mod(limit - pageSize, pageSize)
                 else pageSize // Get an entire page
     in
         adjustedLimit;
 
-// Data Source Kind description
 MicrosoftEnergyDataServices = [
     TestConnection = (dataSourcePath) =>
         let
@@ -145,7 +131,6 @@ MicrosoftEnergyDataServices = [
     Label = Extension.LoadString("DataSourceLabel")
 ];
 
-// Data Source UI publishing description
 MicrosoftEnergyDataServices.Publish = [
     Beta = true,
     Category = "Other",
@@ -264,6 +249,7 @@ TokenMethod = (dataSourcePath, code, grant_type, optional verifier) =>
             Parts;
  
 ValueNumber.IfNull = (a, b, fieldname) => if a <> null then ",""" & fieldname & """: " & Number.ToText(a) else b;
+
 ValueText.IfNullOrEmpty = (a, b, fieldname) => if (a <> null and a <> "") then  ",""" & fieldname & """: [" & a & "]" else b;
  
 GetQueryString = (kind as text, query as text, optional limit as number, optional offset as number, optional returnedFields as text) as text =>
@@ -271,7 +257,6 @@ GetQueryString = (kind as text, query as text, optional limit as number, optiona
         queryText = "{""kind"": """ & kind & """,""query"": """ & query & """" & ValueNumber.IfNull(limit, "", "limit") & ValueNumber.IfNull(offset, "", "offset") & ValueText.IfNullOrEmpty(returnedFields, "", "returnedFields") & "}"
     in
         queryText;
-
 
 Table.GenerateByPage = (getNextPage as function) as table =>
     let        
