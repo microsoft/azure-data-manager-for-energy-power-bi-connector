@@ -1,22 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-
-// Cases
-//                                          //// Limit > 1000 ***
-//                                          //// Limit = 1000 ***
-//                                          //// Limit < 1000 ***
-//                                          //// No limit ****
-//                                          //// Limit > page size ***
-//                                          //// Limit = page size ****
-//                                          //// Limit < page size***
-//                                          //// Limit = 0 (broken) ***
-//                                          //// Limit < 0 --- BROKEN
-//                                          //// Limit > page size && limit < 1000 ***
-//                                          //// Limit = max record count && limit < 1000
-
-//                                          //// Limit 1 less than max record count (broken) ****
-
 section MicrosoftEnergyDataServicesTests;
 
 shared MicrosoftEnergyDataServices.Test = 
@@ -26,6 +10,8 @@ shared MicrosoftEnergyDataServices.Test =
     tenantId = "72f988bf-86f1-41af-91ab-2d7cd011db47",
     endpoint = "https://platform4832.energy.azure.com/api/search/v2/query",
     datapatition = "platform4832-opendes",
+    kind = "osdu:wks:master-data--Well:1.0.0",
+    query = "*",
 
     // Fact(<Name of the Test>, <Expected Value>, <Actual Value>)
     facts = 
@@ -36,16 +22,16 @@ shared MicrosoftEnergyDataServices.Test =
                                          tenantId,
                                          endpoint,
                                          datapatition,
-                                         "osdu:wks:master-data--Well:1.0.0",
-                                         "*"))),
+                                         kind,
+                                         query))),
         Fact("Check that total record count is calculated there is a limit",
             4947,
             GetTotalCount(MicrosoftEnergyDataServices.Search(clientId,
                                          tenantId,
                                          endpoint,
                                          datapatition,
-                                         "osdu:wks:master-data--Well:1.0.0",
-                                         "*",
+                                         kind,
+                                         query,
                                          204))),
         Fact("Check that correct number of records are retrieved when there is no limit",
             4947,
@@ -53,16 +39,16 @@ shared MicrosoftEnergyDataServices.Test =
                                          tenantId,
                                          endpoint,
                                          datapatition,
-                                         "osdu:wks:master-data--Well:1.0.0",
-                                         "*"))),
+                                         kind,
+                                         query))),
         Fact("Check that correct number of records are retrieved when the limit is greater than the service's max page size",
             1500,
             GetNumberOfRows(MicrosoftEnergyDataServices.Search(clientId,
                                          tenantId,
                                          endpoint,
                                          datapatition,
-                                         "osdu:wks:master-data--Well:1.0.0",
-                                         "*",
+                                         kind,
+                                         query,
                                          1500))),
         Fact("Check that correct number of records are retrieved when the limit equals the service's max page size",
             1000,
@@ -70,8 +56,8 @@ shared MicrosoftEnergyDataServices.Test =
                                          tenantId,
                                          endpoint,
                                          datapatition,
-                                         "osdu:wks:master-data--Well:1.0.0",
-                                         "*",
+                                         kind,
+                                         query,
                                          1000))),
         Fact("Check that correct number of records are retrieved when the limit is equal to the connectors's page size",
             100,
@@ -79,8 +65,8 @@ shared MicrosoftEnergyDataServices.Test =
                                          tenantId,
                                          endpoint,
                                          datapatition,
-                                         "osdu:wks:master-data--Well:1.0.0",
-                                         "*",
+                                         kind,
+                                         query,
                                          100))),
         Fact("Check that correct number of records are retrieved when the limit is less than the connectors's page size",
             10,
@@ -88,8 +74,8 @@ shared MicrosoftEnergyDataServices.Test =
                                          tenantId,
                                          endpoint,
                                          datapatition,
-                                         "osdu:wks:master-data--Well:1.0.0",
-                                         "*",
+                                         kind,
+                                         query,
                                          10))),
         Fact("Check that correct number of records are retrieved when the limit is equal to the total count",
             4947,
@@ -97,8 +83,8 @@ shared MicrosoftEnergyDataServices.Test =
                                          tenantId,
                                          endpoint,
                                          datapatition,
-                                         "osdu:wks:master-data--Well:1.0.0",
-                                         "*",
+                                         kind,
+                                         query,
                                          4947))),
         Fact("Check that correct number of records are retrieved when the limit is greater than the total count",
             4947,
@@ -106,8 +92,8 @@ shared MicrosoftEnergyDataServices.Test =
                                          tenantId,
                                          endpoint,
                                          datapatition,
-                                         "osdu:wks:master-data--Well:1.0.0",
-                                         "*",
+                                         kind,
+                                         query,
                                          5000))),
         Fact("Check that correct number of records are retrieved when the limit is 0",
             10, // Microsoft Energy Data Services will default to 10 if the limit is 0
@@ -115,26 +101,17 @@ shared MicrosoftEnergyDataServices.Test =
                                          tenantId,
                                          endpoint,
                                          datapatition,
-                                         "osdu:wks:master-data--Well:1.0.0",
-                                         "*",
+                                         kind,
+                                         query,
                                          0))),
-//         Fact("Check that correct number of records are retrieved when the limit is negative",  // *** Need to handle this- oak returns 400
-//             10,
-//             GetNumberOfRows(MicrosoftEnergyDataServices.Search(clientId,
-//                                          tenantId,
-//                                          endpoint,
-//                                          datapatition,
-//                                          "osdu:wks:master-data--Well:1.0.0",
-//                                          "*",
-//                                          -5))),
         Fact("Check that a partial final page, where the difference in limit and page size is greater than the page size, retrieves the correct number of records",
             204,
             GetNumberOfRows(MicrosoftEnergyDataServices.Search(clientId,
                                          tenantId,
                                          endpoint,
                                          datapatition,
-                                         "osdu:wks:master-data--Well:1.0.0",
-                                         "*",
+                                         kind,
+                                         query,
                                          204))),
         Fact("Check that a partial final page, where the difference in limit and page size is less than the page size, retrieves the correct number of records",
             150,
@@ -142,8 +119,8 @@ shared MicrosoftEnergyDataServices.Test =
                                          tenantId,
                                          endpoint,
                                          datapatition,
-                                         "osdu:wks:master-data--Well:1.0.0",
-                                         "*",
+                                         kind,
+                                         query,
                                          150)))
     },
     report = Facts.Summarize(facts)
