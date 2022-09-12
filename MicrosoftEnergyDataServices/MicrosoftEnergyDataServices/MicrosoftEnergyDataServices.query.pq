@@ -6,10 +6,10 @@ section MicrosoftEnergyDataServicesTests;
 shared MicrosoftEnergyDataServices.Test = 
 [
     // Put any common variables here if you only want them to be evaluated once
-    clientId = "f5e3329f-3963-4484-83e5-2acbf00cdad3",
-    tenantId = "72f988bf-86f1-41af-91ab-2d7cd011db47",
-    endpoint = "https://platform4832.energy.azure.com/api/search/v2/query",
-    datapatition = "platform4832-opendes",
+    clientId = "<client id>",
+    tenantId = "<tenant id>",
+    endpoint = "https://<service name>.energy.azure.com/api/search/v2/query",
+    datapatition = "<data patition ID>",
     kind = "osdu:wks:master-data--Well:1.0.0",
     query = "*",
 
