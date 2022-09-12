@@ -98,7 +98,7 @@ RetrievedAllPages = (previousPage, optional limit as number) =>
             else
                 if collectedItems = totalItems then // Retrieved all records, regardless of user's limit
                     true
-                else if not (limit = null) and collectedItems >= limit then // User specified limit and we retrieved that many records. Using >= comparison in case user specified 0 limit - EDS will default to 10 in that case
+                else if not (limit = null) and collectedItems >= limit then // User specified limit and we retrieved that many records. Using >= comparison in case user specified 0 limit - Microsoft Energy Data Service will default to 10 in that case
                     true
                 else // We have more records to retrieve beause we haven't retrieved them all yet, or we haven't reached the user's optional limit
                     false
