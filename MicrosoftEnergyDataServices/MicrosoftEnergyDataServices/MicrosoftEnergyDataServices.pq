@@ -22,7 +22,7 @@ shared MicrosoftEnergyDataServices.Search = (clientId as text,
         results = GetSearchResults(endpoint, dataPartition, kind, query, validLimit, returnedFields),
         totalRecordCount = GetTotalRecordCount(endpoint, dataPartition, kind, query)
     in
-        [totalCount = totalRecordCount, results = results, listcount = Table.RowCount(results)];
+        [totalCount = totalRecordCount, results = results];
 
 ValidateLimit = (limit) => 
     let
@@ -30,7 +30,7 @@ ValidateLimit = (limit) =>
             if limit = null or limit >= 0 then 
                 limit
             else
-                error "Invalid Limit: Cannot be negative"
+                error Extension.LoadString("ErrorNegativeLimit")
     in 
         validLimit;
 
