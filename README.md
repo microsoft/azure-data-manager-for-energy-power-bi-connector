@@ -12,16 +12,16 @@ You will need Visual Studio 2019 and the Power Query SDK to compile the project.
 1. Install the [Power Query SDK](https://marketplace.visualstudio.com/items?itemName=Dakahn.PowerQuerySDK) from the Visual Studio Marketplace
 
 ## Testing the Connector
-To test the connector you must configure your Microsoft Energy Data Service instance, and connector first.
+To test the connector you must configure your Microsoft Energy Data Services instance, and connector first.
 
-### Configuring Microsoft Energy Data Service
+### Configuring Microsoft Energy Data Services
 Add the below URI as a Single Page Application (SPA) redirect URI to your AD Application
 
     https://oauth.powerbi.com/views/oauthredirect.html
 
 ### Configuring the Connector
 
-Provide a client ID, tenant ID, Microsoft Energy Data Service instance name, and data partition ID in [MicrosoftEnergyDataServices.query.pq](./MicrosoftEnergyDataServices/MicrosoftEnergyDataServices/MicrosoftEnergyDataServices.query.pq). Once this is done, you can run the connector by pressing the Run button or F5.
+Provide a client ID, tenant ID, Microsoft Energy Data Services instance name, and data partition ID in [MicrosoftEnergyDataServices.query.pq](./MicrosoftEnergyDataServices/MicrosoftEnergyDataServices/MicrosoftEnergyDataServices.query.pq). Once this is done, you can run the connector by pressing the Run button or F5.
 
 ## Contributing
 
