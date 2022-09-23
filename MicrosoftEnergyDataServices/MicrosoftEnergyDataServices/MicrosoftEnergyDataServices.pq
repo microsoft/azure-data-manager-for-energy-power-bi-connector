@@ -1,9 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
+
 [Version="1.0.0"]
 section MicrosoftEnergyDataServices;
 
-redirectUri = "https://oauth.powerbi.com/views/oauthredirect.html"; // Must be a platform that supports PKCE
+redirectUri = "https://oauth.powerbi.com/views/oauthredirect.html"; // Must be a platform that supports PKCE (Single Page Application)
 logoutUri = "https://login.microsoftonline.com/logout.srf";
 pageSize = 100;
 edsDefaultLimitSizeWhenZeroRequested = 10;
@@ -146,7 +147,7 @@ MicrosoftEnergyDataServices.Publish = [
     Beta = true,
     Category = "Other",
     ButtonText = { Extension.LoadString("ButtonTitle"), Extension.LoadString("ButtonHelp") },
-    LearnMoreUrl = "https://powerbi.microsoft.com/",
+    LearnMoreUrl = "https://learn.microsoft.com/en-us/azure/energy-data-services/",
     SourceImage = MicrosoftEnergyDataServices.Icons,
     SourceTypeImage = MicrosoftEnergyDataServices.Icons
 ];
