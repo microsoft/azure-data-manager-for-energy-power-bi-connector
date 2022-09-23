@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+[Version="1.0.0"]
 section MicrosoftEnergyDataServicesTests;
 
 shared MicrosoftEnergyDataServices.Test = 
 [
-    // Put any common variables here if you only want them to be evaluated once
     clientId = "<client id>",
     tenantId = "<tenant id>",
     endpoint = "https://<service name>.energy.azure.com/api/search/v2/query",
@@ -41,6 +41,14 @@ shared MicrosoftEnergyDataServices.Test =
                                          datapatition,
                                          kind,
                                          query))),
+        Fact("Check that correct number of records are retrieved when there is a query",
+            4947,
+            GetNumberOfRows(MicrosoftEnergyDataServices.Search(clientId,
+                                         tenantId,
+                                         endpoint,
+                                         datapatition,
+                                         kind,
+                                         "type:master-data--Well"))),
         Fact("Check that correct number of records are retrieved when the limit is greater than the service's max page size",
             1500,
             GetNumberOfRows(MicrosoftEnergyDataServices.Search(clientId,
