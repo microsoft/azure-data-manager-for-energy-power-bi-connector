@@ -48,7 +48,7 @@ shared MicrosoftEnergyDataServices.Test =
                                          instanceName,
                                          datapatition,
                                          kind,
-                                         "type:master-data--Well")))
+                                         "type:master-data--Well"))),
         Fact("Check that correct number of records are retrieved when the limit is greater than the service's max page size",
             1500,
             GetNumberOfRows(MicrosoftEnergyDataServices.Search(clientId,
