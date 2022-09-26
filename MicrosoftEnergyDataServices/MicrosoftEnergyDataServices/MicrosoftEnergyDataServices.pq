@@ -10,9 +10,62 @@ pageSize = 100;
 edsDefaultLimitSizeWhenZeroRequested = 10;
 
 [DataSource.Kind="MicrosoftEnergyDataServices", Publish="MicrosoftEnergyDataServices.Publish"]
-shared MicrosoftEnergyDataServices.Search = (clientId as text, 
+shared MicrosoftEnergyDataServices.Search = Value.ReplaceType(MicrosoftEnergyDataServicesImpl, MicrosoftEnergyDataServicesType);
+
+MicrosoftEnergyDataServicesType = type function (
+    clientId as (type text meta [
+        Documentation.FieldCaption = "Azure AD Application Client ID",
+        Documentation.FieldDescription = "The ID of the Azure AD Application used to create the Microsoft Energy Data Services instance",
+        Documentation.SampleValues = {"fb82bc98-a537-4c2b-a4ed-cf7c53eed5f9"}
+    ]),
+    tenantId as (type text meta [
+        Documentation.FieldCaption = "Azure AD Tenant ID",
+        Documentation.FieldDescription = "The ID of the Azure AD tenant the Azure AD Application belongs to",
+        Documentation.SampleValues = {"4b12b551-b235-46b3-9f79-6a61adc75b6a"}
+    ]),
+    serviceName as (type text meta [
+        Documentation.FieldCaption = "Microsoft Energy Data Services Name",
+        Documentation.FieldDescription = "Name of the Microsoft Energy Data Services instance",
+        Documentation.SampleValues = {"platform4321"}
+    ]),
+    dataPartition as (type text meta [
+        Documentation.FieldCaption = "Data Partition",
+        Documentation.FieldDescription = "The ID of the Microsoft Energy Data Services data partition",
+        Documentation.SampleValues = {"platform4321-opendes"}
+    ]),
+    kind as (type text meta [
+        Documentation.FieldCaption = "Record Kind",
+        Documentation.FieldDescription = "The kind of the record to query",
+        Documentation.SampleValues = {"osdu:wks:master-data--Well:1.0.0"}
+    ]),
+    query as (type text meta [
+        Documentation.FieldCaption = "Query",
+        Documentation.FieldDescription = "Query string based on Lucene query string syntax",
+        Documentation.SampleValues = {"*"}
+    ]),
+    optional limit as (type number meta [
+        Documentation.FieldCaption = "Limit",
+        Documentation.FieldDescription = "The maximum number of results to return",
+        Documentation.SampleValues = {"2000"}
+    ]),
+    optional returnedFields as (type text meta [
+        Documentation.FieldCaption = "Returned Fields",
+        Documentation.FieldDescription = "The fields on which to project the results",
+        Documentation.SampleValues = {"""data.FacilityName"", ""data.Source"""}
+    ]))
+    as table meta [
+        Documentation.Name = "Microsoft Energy Data Services Search",
+        Documentation.LongDescription = "Queries for records in the Microsoft Energy Data Services instance",
+        Documentation.Examples = {[
+            Description = "Returns a record that contains the count of records which satisfy the query, and a table of records that's been optionally limited by the limit parameter",
+            Code = "MicrosoftEnergyDataServices.Search(""fb82bc98-a537-4c2b-a4ed-cf7c53eed5f9"", ""4b12b551-b235-46b3-9f79-6a61adc75b6a"", ""platform4321"", ""platform4321-opendes"", ""osdu:wks:master-data--Well:1.0.0"", ""*"", 2, null)",
+            Result = "[totalCount = 4947, results = #table({""Column1""}, {{[...]}, {[...]}})]"
+        ]}
+    ];
+
+MicrosoftEnergyDataServicesImpl = (clientId as text, 
                                       tenantId as text, 
-                                      endpoint as text, 
+                                      serviceName as text, 
                                       dataPartition as text,
                                       kind as text, 
                                       query as text,
@@ -20,6 +73,7 @@ shared MicrosoftEnergyDataServices.Search = (clientId as text,
                                       optional returnedFields as text) =>
     let
         validLimit = ValidateLimit(limit),
+        endpoint = "https://" & serviceName & ".energy.azure.com/api/search/v2/query",
         results = GetSearchResults(endpoint, dataPartition, kind, query, validLimit, returnedFields),
         totalRecordCount = GetTotalRecordCount(endpoint, dataPartition, kind, query)
     in
