@@ -123,10 +123,73 @@
   <data name="ButtonTitle" xml:space="preserve">
     <value>Microsoft Energy Data Services</value>
   </data>
+  <data name="clientIdFieldCaption" xml:space="preserve">
+    <value>Azure AD Application Client ID</value>
+  </data>
+  <data name="clientIdFieldDescription" xml:space="preserve">
+    <value>The ID of the Azure AD Application used to create the Microsoft Energy Data Services instance</value>
+  </data>
+  <data name="dataPartitionFieldCaption" xml:space="preserve">
+    <value>Data Partition</value>
+  </data>
+  <data name="dataPartitionFieldDescription" xml:space="preserve">
+    <value>The ID of the Microsoft Energy Data Services data partition</value>
+  </data>
+  <data name="dataPartitionSampleValues" xml:space="preserve">
+    <value>platform4321-opendes</value>
+  </data>
   <data name="DataSourceLabel" xml:space="preserve">
     <value>Microsoft Energy Data Services</value>
   </data>
+  <data name="documentationLongDescription" xml:space="preserve">
+    <value>Queries for records in the Microsoft Energy Data Services instance</value>
+  </data>
+  <data name="documentationName" xml:space="preserve">
+    <value>Microsoft Energy Data Services Search</value>
+  </data>
   <data name="ErrorNegativeLimit" xml:space="preserve">
     <value>Limit cannot be negative</value>
+  </data>
+  <data name="exampleDescription" xml:space="preserve">
+    <value>Returns a record that contains the count of records which satisfy the query, and a table of records that's been optionally limited by the limit parameter</value>
+  </data>
+  <data name="kindFieldCaption" xml:space="preserve">
+    <value>Record Kind</value>
+  </data>
+  <data name="kindFieldDescription" xml:space="preserve">
+    <value>The kind of the record to query</value>
+  </data>
+  <data name="limitFieldCaption" xml:space="preserve">
+    <value>Limit</value>
+  </data>
+  <data name="limitFieldDescription" xml:space="preserve">
+    <value>The maximum number of results to return</value>
+  </data>
+  <data name="queryFieldCaption" xml:space="preserve">
+    <value>Query</value>
+  </data>
+  <data name="queryFieldDescription" xml:space="preserve">
+    <value>Query string based on Lucene query string syntax</value>
+  </data>
+  <data name="returnedFieldsFieldCaption" xml:space="preserve">
+    <value>Returned Fields</value>
+  </data>
+  <data name="returnedFieldsFieldDescription" xml:space="preserve">
+    <value>The fields on which to project the results</value>
+  </data>
+  <data name="serviceNameFieldCaption" xml:space="preserve">
+    <value>Microsoft Energy Data Services Name</value>
+  </data>
+  <data name="serviceNameFieldDescription" xml:space="preserve">
+    <value>Name of the Microsoft Energy Data Services instance</value>
+  </data>
+  <data name="serviceNameSampleValues" xml:space="preserve">
+    <value>platform4321</value>
+  </data>
+  <data name="tenantIdFieldDescription" xml:space="preserve">
+    <value>The ID of the Azure AD tenant the Azure AD Application belongs to</value>
+  </data>
+  <data name="tentantIdFieldCaption" xml:space="preserve">
+    <value>Azure AD Tenant ID</value>
   </data>
 </root>

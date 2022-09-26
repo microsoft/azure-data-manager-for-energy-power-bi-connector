@@ -14,50 +14,50 @@ shared MicrosoftEnergyDataServices.Search = Value.ReplaceType(MicrosoftEnergyDat
 
 MicrosoftEnergyDataServicesType = type function (
     clientId as (type text meta [
-        Documentation.FieldCaption = "Azure AD Application Client ID",
-        Documentation.FieldDescription = "The ID of the Azure AD Application used to create the Microsoft Energy Data Services instance",
+        Documentation.FieldCaption = Extension.LoadString("clientIdFieldCaption"),
+        Documentation.FieldDescription = Extension.LoadString("clientIdFieldDescription"),
         Documentation.SampleValues = {"fb82bc98-a537-4c2b-a4ed-cf7c53eed5f9"}
     ]),
     tenantId as (type text meta [
-        Documentation.FieldCaption = "Azure AD Tenant ID",
-        Documentation.FieldDescription = "The ID of the Azure AD tenant the Azure AD Application belongs to",
+        Documentation.FieldCaption = Extension.LoadString("tentantIdFieldCaption"),
+        Documentation.FieldDescription = Extension.LoadString("tenantIdFieldDescription"),
         Documentation.SampleValues = {"4b12b551-b235-46b3-9f79-6a61adc75b6a"}
     ]),
     serviceName as (type text meta [
-        Documentation.FieldCaption = "Microsoft Energy Data Services Name",
-        Documentation.FieldDescription = "Name of the Microsoft Energy Data Services instance",
-        Documentation.SampleValues = {"platform4321"}
+        Documentation.FieldCaption = Extension.LoadString("serviceNameFieldCaption"),
+        Documentation.FieldDescription = Extension.LoadString("serviceNameFieldDescription"),
+        Documentation.SampleValues = {Extension.LoadString("serviceNameSampleValues")}
     ]),
     dataPartition as (type text meta [
-        Documentation.FieldCaption = "Data Partition",
-        Documentation.FieldDescription = "The ID of the Microsoft Energy Data Services data partition",
-        Documentation.SampleValues = {"platform4321-opendes"}
+        Documentation.FieldCaption = Extension.LoadString("dataPartitionFieldCaption"),
+        Documentation.FieldDescription = Extension.LoadString("dataPartitionFieldDescription"),
+        Documentation.SampleValues = {Extension.LoadString("dataPartitionSampleValues")}
     ]),
     kind as (type text meta [
-        Documentation.FieldCaption = "Record Kind",
-        Documentation.FieldDescription = "The kind of the record to query",
+        Documentation.FieldCaption = Extension.LoadString("kindFieldCaption"),
+        Documentation.FieldDescription = Extension.LoadString("kindFieldDescription"),
         Documentation.SampleValues = {"osdu:wks:master-data--Well:1.0.0"}
     ]),
     query as (type text meta [
-        Documentation.FieldCaption = "Query",
-        Documentation.FieldDescription = "Query string based on Lucene query string syntax",
+        Documentation.FieldCaption = Extension.LoadString("queryFieldCaption"),
+        Documentation.FieldDescription = Extension.LoadString("queryFieldDescription"),
         Documentation.SampleValues = {"*"}
     ]),
     optional limit as (type number meta [
-        Documentation.FieldCaption = "Limit",
-        Documentation.FieldDescription = "The maximum number of results to return",
+        Documentation.FieldCaption = Extension.LoadString("limitFieldCaption"),
+        Documentation.FieldDescription = Extension.LoadString("limitFieldDescription"),
         Documentation.SampleValues = {"2000"}
     ]),
     optional returnedFields as (type text meta [
-        Documentation.FieldCaption = "Returned Fields",
-        Documentation.FieldDescription = "The fields on which to project the results",
+        Documentation.FieldCaption = Extension.LoadString("returnedFieldsFieldCaption"),
+        Documentation.FieldDescription = Extension.LoadString("returnedFieldsFieldDescription"),
         Documentation.SampleValues = {"""data.FacilityName"", ""data.Source"""}
     ]))
     as table meta [
-        Documentation.Name = "Microsoft Energy Data Services Search",
-        Documentation.LongDescription = "Queries for records in the Microsoft Energy Data Services instance",
+        Documentation.Name = Extension.LoadString("documentationName"),
+        Documentation.LongDescription = Extension.LoadString("documentationLongDescription"),
         Documentation.Examples = {[
-            Description = "Returns a record that contains the count of records which satisfy the query, and a table of records that's been optionally limited by the limit parameter",
+            Description = Extension.LoadString("exampleDescription"),
             Code = "MicrosoftEnergyDataServices.Search(""fb82bc98-a537-4c2b-a4ed-cf7c53eed5f9"", ""4b12b551-b235-46b3-9f79-6a61adc75b6a"", ""platform4321"", ""platform4321-opendes"", ""osdu:wks:master-data--Well:1.0.0"", ""*"", 2, null)",
             Result = "[totalCount = 4947, results = #table({""Column1""}, {{[...]}, {[...]}})]"
         ]}
