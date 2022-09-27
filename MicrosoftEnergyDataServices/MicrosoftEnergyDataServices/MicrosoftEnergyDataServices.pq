@@ -59,7 +59,7 @@ MicrosoftEnergyDataServicesType = type function (
         Documentation.Examples = {[
             Description = Extension.LoadString("exampleDescription"),
             Code = "MicrosoftEnergyDataServices.Search(""fb82bc98-a537-4c2b-a4ed-cf7c53eed5f9"", ""4b12b551-b235-46b3-9f79-6a61adc75b6a"", ""platform4321"", ""platform4321-opendes"", ""osdu:wks:master-data--Well:1.0.0"", ""*"", 2, null)",
-            Result = "[totalCount = 4947, results = #table({""Column1""}, {{[...]}, {[...]}})]"
+            Result = Extension.LoadString("exampleResult")
         ]}
     ];
 
@@ -75,9 +75,16 @@ MicrosoftEnergyDataServicesImpl = (clientId as text,
         validLimit = ValidateLimit(limit),
         endpoint = "https://" & serviceName & ".energy.azure.com/api/search/v2/query",
         results = GetSearchResults(endpoint, dataPartition, kind, query, validLimit, returnedFields),
-        totalRecordCount = GetTotalRecordCount(endpoint, dataPartition, kind, query)
+        totalRecordCount = GetTotalRecordCount(endpoint, dataPartition, kind, query),
+        objects = #table(
+            {"Name", "Key", "Data", "ItemKind", "ItemName", "IsLeaf"},
+            {
+                {kind, kind, Record.ToTable([Count = totalRecordCount, Records = results]), "Table", "Table", true}
+            }
+        ),
+        navigationTable = Table.ToNavigationTable(objects, {"Key"}, "Name", "Data", "ItemKind", "ItemName", "IsLeaf")
     in
-        [totalCount = totalRecordCount, results = results];
+        navigationTable;
 
 ValidateLimit = (limit) => 
     let
@@ -85,7 +92,7 @@ ValidateLimit = (limit) =>
             if limit = null or limit >= 0 then 
                 limit
             else
-                error Extension.LoadString("ErrorNegativeLimit")
+                error Extension.LoadString("errorNegativeLimit")
     in 
         validLimit;
 
@@ -138,7 +145,7 @@ GetSearchResultPage = (endpoint as text,
        nextStart = if List.IsEmpty(results[results]) then 0
              else startPosition + pageSize,
        updatedCount = List.Count(results[results]) + runningCountOfRetrievedRecords,
-       resultTable = Table.FromList(results[results], Splitter.SplitByNothing(), null, null, ExtraValues.Error)
+       resultTable = Table.FromList(results[results], Splitter.SplitByNothing(), {"Records"}, null, ExtraValues.Error)
     in
        resultTable meta [startPosition = nextStart, totalNumberOfRecords = totalNumberOfRecords, runningCountOfRetrievedRecords = updatedCount];
 
@@ -194,13 +201,13 @@ MicrosoftEnergyDataServices = [
             Logout=Logout
         ]
     ],
-    Label = Extension.LoadString("DataSourceLabel")
+    Label = Extension.LoadString("dataSourceLabel")
 ];
 
 MicrosoftEnergyDataServices.Publish = [
     Beta = true,
     Category = "Other",
-    ButtonText = { Extension.LoadString("ButtonTitle"), Extension.LoadString("ButtonHelp") },
+    ButtonText = { Extension.LoadString("buttonTitle"), Extension.LoadString("buttonHelp") },
     LearnMoreUrl = "https://learn.microsoft.com/en-us/azure/energy-data-services/",
     SourceImage = MicrosoftEnergyDataServices.Icons,
     SourceTypeImage = MicrosoftEnergyDataServices.Icons
@@ -344,3 +351,26 @@ Table.GenerateByPage = (getNextPage as function) as table =>
                 Table.ExpandTableColumn(tableOfPages, "Column1", Table.ColumnNames(firstRow[Column1])),
                 Value.Type(firstRow[Column1])
             );
+
+Table.ToNavigationTable = (
+    table as table,
+    keyColumns as list,
+    nameColumn as text,
+    dataColumn as text,
+    itemKindColumn as text,
+    itemNameColumn as text,
+    isLeafColumn as text
+) as table =>
+    let
+        tableType = Value.Type(table),
+        newTableType = Type.AddTableKey(tableType, keyColumns, true) meta 
+        [
+            NavigationTable.NameColumn = nameColumn, 
+            NavigationTable.DataColumn = dataColumn,
+            NavigationTable.ItemKindColumn = itemKindColumn, 
+            Preview.DelayColumn = itemNameColumn, 
+            NavigationTable.IsLeafColumn = isLeafColumn
+        ],
+        navigationTable = Value.ReplaceType(table, newTableType)
+    in
+        navigationTable;

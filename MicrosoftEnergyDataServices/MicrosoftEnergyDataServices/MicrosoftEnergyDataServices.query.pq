@@ -4,15 +4,15 @@
 [Version="1.0.0"]
 section MicrosoftEnergyDataServicesTests;
 
+clientId = "<client id>";
+tenantId = "<tenant id>";
+instanceName = "<Microsoft Energy Data Services instance name>";
+datapatition = "<data patition ID>";
+kind = "osdu:wks:master-data--Well:1.0.0";
+query = "*";
+
 shared MicrosoftEnergyDataServices.Test = 
 [
-    clientId = "<client id>",
-    tenantId = "<tenant id>",
-    instanceName = "<Microsoft Energy Data Services instance name>",
-    datapatition = "<data patition ID>",
-    kind = "osdu:wks:master-data--Well:1.0.0",
-    query = "*",
-
     // Fact(<Name of the Test>, <Expected Value>, <Actual Value>)
     facts = 
     {
@@ -143,11 +143,11 @@ shared MicrosoftEnergyDataServices.Test =
     report = Facts.Summarize(facts)
 ][report];
 
-GetTotalCount = (result as record) => 
-    result[totalCount];
+GetTotalCount = (result as table) => 
+   result{[Key=kind]}[Data]{[Name="Count"]}[Value];
 
-GetNumberOfRows = (result as record) => 
-    Table.RowCount(result[results]);
+GetNumberOfRows = (result as table) => 
+    Table.RowCount(result{[Key=kind]}[Data]{[Name="Records"]}[Value]);
 
 /// COMMON UNIT TESTING CODE 
 Fact = (_subject as text, _expected, _actual) as record =>
