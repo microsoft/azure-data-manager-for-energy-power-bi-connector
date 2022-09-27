@@ -10,9 +10,62 @@ pageSize = 100;
 edsDefaultLimitSizeWhenZeroRequested = 10;
 
 [DataSource.Kind="MicrosoftEnergyDataServices", Publish="MicrosoftEnergyDataServices.Publish"]
-shared MicrosoftEnergyDataServices.Search = (clientId as text, 
+shared MicrosoftEnergyDataServices.Search = Value.ReplaceType(MicrosoftEnergyDataServicesImpl, MicrosoftEnergyDataServicesType);
+
+MicrosoftEnergyDataServicesType = type function (
+    clientId as (type text meta [
+        Documentation.FieldCaption = Extension.LoadString("clientIdFieldCaption"),
+        Documentation.FieldDescription = Extension.LoadString("clientIdFieldDescription"),
+        Documentation.SampleValues = {"fb82bc98-a537-4c2b-a4ed-cf7c53eed5f9"}
+    ]),
+    tenantId as (type text meta [
+        Documentation.FieldCaption = Extension.LoadString("tentantIdFieldCaption"),
+        Documentation.FieldDescription = Extension.LoadString("tenantIdFieldDescription"),
+        Documentation.SampleValues = {"4b12b551-b235-46b3-9f79-6a61adc75b6a"}
+    ]),
+    serviceName as (type text meta [
+        Documentation.FieldCaption = Extension.LoadString("serviceNameFieldCaption"),
+        Documentation.FieldDescription = Extension.LoadString("serviceNameFieldDescription"),
+        Documentation.SampleValues = {Extension.LoadString("serviceNameSampleValues")}
+    ]),
+    dataPartition as (type text meta [
+        Documentation.FieldCaption = Extension.LoadString("dataPartitionFieldCaption"),
+        Documentation.FieldDescription = Extension.LoadString("dataPartitionFieldDescription"),
+        Documentation.SampleValues = {Extension.LoadString("dataPartitionSampleValues")}
+    ]),
+    kind as (type text meta [
+        Documentation.FieldCaption = Extension.LoadString("kindFieldCaption"),
+        Documentation.FieldDescription = Extension.LoadString("kindFieldDescription"),
+        Documentation.SampleValues = {"osdu:wks:master-data--Well:1.0.0"}
+    ]),
+    query as (type text meta [
+        Documentation.FieldCaption = Extension.LoadString("queryFieldCaption"),
+        Documentation.FieldDescription = Extension.LoadString("queryFieldDescription"),
+        Documentation.SampleValues = {"*"}
+    ]),
+    optional limit as (type number meta [
+        Documentation.FieldCaption = Extension.LoadString("limitFieldCaption"),
+        Documentation.FieldDescription = Extension.LoadString("limitFieldDescription"),
+        Documentation.SampleValues = {"2000"}
+    ]),
+    optional returnedFields as (type text meta [
+        Documentation.FieldCaption = Extension.LoadString("returnedFieldsFieldCaption"),
+        Documentation.FieldDescription = Extension.LoadString("returnedFieldsFieldDescription"),
+        Documentation.SampleValues = {"""data.FacilityName"", ""data.Source"""}
+    ]))
+    as table meta [
+        Documentation.Name = Extension.LoadString("documentationName"),
+        Documentation.LongDescription = Extension.LoadString("documentationLongDescription"),
+        Documentation.Examples = {[
+            Description = Extension.LoadString("exampleDescription"),
+            Code = "MicrosoftEnergyDataServices.Search(""fb82bc98-a537-4c2b-a4ed-cf7c53eed5f9"", ""4b12b551-b235-46b3-9f79-6a61adc75b6a"", ""platform4321"", ""platform4321-opendes"", ""osdu:wks:master-data--Well:1.0.0"", ""*"", 2, null)",
+            Result = "[totalCount = 4947, results = #table({""Column1""}, {{[...]}, {[...]}})]"
+        ]}
+    ];
+
+MicrosoftEnergyDataServicesImpl = (clientId as text, 
                                       tenantId as text, 
-                                      endpoint as text, 
+                                      serviceName as text, 
                                       dataPartition as text,
                                       kind as text, 
                                       query as text,
@@ -20,6 +73,7 @@ shared MicrosoftEnergyDataServices.Search = (clientId as text,
                                       optional returnedFields as text) =>
     let
         validLimit = ValidateLimit(limit),
+        endpoint = "https://" & serviceName & ".energy.azure.com/api/search/v2/query",
         results = GetSearchResults(endpoint, dataPartition, kind, query, validLimit, returnedFields),
         totalRecordCount = GetTotalRecordCount(endpoint, dataPartition, kind, query)
     in
