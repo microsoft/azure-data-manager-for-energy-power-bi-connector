@@ -23,6 +23,19 @@ Add the below URI as a Single Page Application (SPA) redirect URI to your AD App
 
 Provide a client ID, tenant ID, Microsoft Energy Data Services instance name, and data partition ID in [MicrosoftEnergyDataServices.query.pq](./MicrosoftEnergyDataServices/MicrosoftEnergyDataServices/MicrosoftEnergyDataServices.query.pq). Once this is done, you can run the connector by pressing the Run button or F5.
 
+### Using the Sample Report
+
+There is a sample template report that can be used to test your connection. The connection details need to be updated with the following steps:
+
+1. Open [Microsoft Energy Data Services Wells Template.pbit](./Reports/Microsoft%20Energy%20Data%20Services%20Wells%20Template.pbit) 
+1. Close the authentication prompt
+1. Close the error dialog
+1. Edit the 'Wells' query
+1. Edit the 'Source' step
+1. Input your client ID, tenant ID, Microsoft Energy Data Services instance name, and data parition ID
+1. Click 'OK'
+1. Click 'Close & Apply'
+
 ## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
