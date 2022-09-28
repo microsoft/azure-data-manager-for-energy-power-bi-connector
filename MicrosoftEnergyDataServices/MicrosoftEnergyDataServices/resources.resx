@@ -117,10 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ButtonHelp" xml:space="preserve">
+  <data name="buttonHelp" xml:space="preserve">
     <value>Connect to Microsoft Energy Data Services</value>
   </data>
-  <data name="ButtonTitle" xml:space="preserve">
+  <data name="buttonTitle" xml:space="preserve">
     <value>Microsoft Energy Data Services</value>
   </data>
   <data name="clientIdFieldCaption" xml:space="preserve">
@@ -138,7 +138,7 @@
   <data name="dataPartitionSampleValues" xml:space="preserve">
     <value>platform4321-opendes</value>
   </data>
-  <data name="DataSourceLabel" xml:space="preserve">
+  <data name="dataSourceLabel" xml:space="preserve">
     <value>Microsoft Energy Data Services</value>
   </data>
   <data name="documentationLongDescription" xml:space="preserve">
@@ -147,11 +147,14 @@
   <data name="documentationName" xml:space="preserve">
     <value>Microsoft Energy Data Services Search</value>
   </data>
-  <data name="ErrorNegativeLimit" xml:space="preserve">
+  <data name="errorNegativeLimit" xml:space="preserve">
     <value>Limit cannot be negative</value>
   </data>
   <data name="exampleDescription" xml:space="preserve">
     <value>Returns a record that contains the count of records which satisfy the query, and a table of records that's been optionally limited by the limit parameter</value>
+  </data>
+  <data name="exampleResult" xml:space="preserve">
+    <value>A navigation table containing [Count = 4947, Records = #table({""Records""}, {{[...]}, {[...]}})]</value>
   </data>
   <data name="kindFieldCaption" xml:space="preserve">
     <value>Record Kind</value>
