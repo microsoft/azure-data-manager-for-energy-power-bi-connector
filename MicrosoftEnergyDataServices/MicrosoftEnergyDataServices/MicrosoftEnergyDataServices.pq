@@ -192,10 +192,9 @@ MicrosoftEnergyDataServices = [
             serviceName = json[serviceName],
             dataPartition = json[dataPartition],
             kind = json[kind],
-            query = json[query],
-            endpoint = BuildEndpoint(serviceName)
+            query = json[query]
         in
-            { "MicrosoftEnergyDataServices.Search", clientId, tenantId, endpoint, dataPartition, kind, query },
+            { "MicrosoftEnergyDataServices.Search", clientId, tenantId, serviceName, dataPartition, kind, query },
     Authentication = [
         OAuth = [
             StartLogin=StartLogin,
