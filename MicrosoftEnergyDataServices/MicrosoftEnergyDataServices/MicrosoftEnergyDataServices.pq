@@ -73,7 +73,7 @@ MicrosoftEnergyDataServicesImpl = (clientId as text,
                                       optional returnedFields as text) =>
     let
         validLimit = ValidateLimit(limit),
-        endpoint = "https://" & serviceName & ".energy.azure.com/api/search/v2/query",
+        endpoint = BuildEndpoint(serviceName),
         results = GetSearchResults(endpoint, dataPartition, kind, query, validLimit, returnedFields),
         totalRecordCount = GetTotalRecordCount(endpoint, dataPartition, kind, query),
         objects = #table(
@@ -96,6 +96,8 @@ ValidateLimit = (limit) =>
     in 
         validLimit;
 
+BuildEndpoint = (serviceName) => "https://" & serviceName & ".energy.azure.com/api/search/v2/query";
+    
 GetTotalRecordCount = (endpoint as text,
                         dataPartition as text,
                         kind as text, 
@@ -187,12 +189,12 @@ MicrosoftEnergyDataServices = [
             json = Json.Document(dataSourcePath),
             clientId = json[clientId],
             tenantId = json[tenantId],
-            endpoint = json[endpoint],
+            serviceName = json[serviceName],
             dataPartition = json[dataPartition],
             kind = json[kind],
             query = json[query]
         in
-            { "MicrosoftEnergyDataServices.Search", clientId, tenantId, endpoint, dataPartition, kind, query },
+            { "MicrosoftEnergyDataServices.Search", clientId, tenantId, serviceName, dataPartition, kind, query },
     Authentication = [
         OAuth = [
             StartLogin=StartLogin,
