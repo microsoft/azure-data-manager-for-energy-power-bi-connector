@@ -36,6 +36,39 @@ There is a sample template report that can be used to test your connection. The 
 1. Click 'OK'
 1. Click 'Close & Apply'
 
+
+## Architecture
+
+There are several pieces of the connector that warrant explanation: authentication, paging, and unit tests
+
+### Authentication
+
+OAuth
+
+### Paging
+
+Paging
+
+### Unit Tests
+
+Unit Tests
+
+## Possible Features for the Future
+
+The connector supports basic search functionality, but there are some areas of improvement: 
+
+### Fetch records at a specified index
+
+Data retreival/paging currently starts at index 0, but it could be modified to start at any index. This could be useful if users have a large amount of data and want to fetch a subset of it. This would require modifications to the paging logic to know where to start.
+
+### Support all search API arguments
+
+The Search API has a number of parameters to it: kind, query, offset, limit, sort, queryAsOwner, spatialFilter, trackTotalCount, aggregateBy, and returnedFields. The connector could be extended to support sort, queryAsOwner, spatialFilter, trackTotalCount, and aggregateBy. It currently makes use of kind, query, offset, liimt, and returnedFields.
+
+### Improve returnedRecords format
+
+Passing values to the returnedFields parameter is not the most userfriendly since each field needs to be enclosed in quotes. The connector could be modified to add quotations around each field, if the user doesn't provide them, before passing them to the Search API.
+
 ## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
