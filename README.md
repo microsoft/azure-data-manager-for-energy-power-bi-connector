@@ -12,9 +12,11 @@ You will need Visual Studio 2019 and the Power Query SDK to compile the project.
 1. Install the [Power Query SDK](https://marketplace.visualstudio.com/items?itemName=Dakahn.PowerQuerySDK) from the Visual Studio Marketplace
 
 ## Testing the Connector
+
 To test the connector you must configure your Microsoft Energy Data Services instance, and connector first.
 
 ### Configuring Microsoft Energy Data Services
+
 Add the below URI as a Single Page Application (SPA) redirect URI to your AD Application
 
     https://oauth.powerbi.com/views/oauthredirect.html
@@ -27,15 +29,14 @@ Provide a client ID, tenant ID, Microsoft Energy Data Services instance name, an
 
 There is a sample template report that can be used to test your connection. The connection details need to be updated with the following steps:
 
-1. Open [Microsoft Energy Data Services Wells Template.pbit](./Reports/Microsoft%20Energy%20Data%20Services%20Wells%20Template.pbit) 
+1. Open [Microsoft Energy Data Services Wells Template.pbit](./Reports/Microsoft%20Energy%20Data%20Services%20Wells%20Template.pbit)
 1. Close the authentication prompt
 1. Close the error dialog
 1. Edit the 'Wells' query
 1. Edit the 'Source' step
-1. Input your client ID, tenant ID, Microsoft Energy Data Services instance name, and data parition ID
+1. Input your client ID, tenant ID, Microsoft Energy Data Services instance name, and data partition ID
 1. Click 'OK'
 1. Click 'Close & Apply'
-
 
 ## Architecture
 
@@ -47,11 +48,11 @@ The connector makes use of [Proof Key for Code Exchange (PKCE)](AdjustPageSizeDe
 
 #### Redirect URI
 
-The `redirectUri` variable can be any valid URI as long as the Azure AD Applications redirect URI mathches it. However, for the connector to support on-premises data gateways, the `redirectUri` must be 'https://oauth.powerbi.com/views/oauthredirect.html'. More information can be found at [Handling Gateway Support](https://learn.microsoft.com/en-us/power-query/handlinggatewaysupport), [OAuth and Power BI](https://learn.microsoft.com/en-us/power-query/samples/github/readme#oauth-and-power-bi), and [Handling Gateway Support page does not specify that you need a specific redirect URI for the gateway to work](https://github.com/MicrosoftDocs/powerquery-docs/issues/284).
+The `redirectUri` variable can be any valid URI as long as the Azure AD Applications redirect URI matches it. However, for the connector to support on-premises data gateways, the `redirectUri` must be 'https://oauth.powerbi.com/views/oauthredirect.html'. More information can be found at [Handling Gateway Support](https://learn.microsoft.com/power-query/handlinggatewaysupport), [OAuth and Power BI](https://learn.microsoft.com/power-query/samples/github/readme#oauth-and-power-bi), and [Handling Gateway Support page does not specify that you need a specific redirect URI for the gateway to work](https://github.com/MicrosoftDocs/powerquery-docs/issues/284).
 
 ### Paging
 
-By default, Microsoft Energy Data Services only returns 1000 records. To get around this limitation, the connector uses the [Table.GenerateByPage](https://learn.microsoft.com/en-us/power-query/helperfunctions#tablegeneratebypage) helper method. More information can be found on [Handling Paging](https://learn.microsoft.com/en-us/power-query/handlingpaging).
+By default, Microsoft Energy Data Services only returns 1000 records. To get around this limitation, the connector uses the [Table.GenerateByPage](https://learn.microsoft.com/power-query/helperfunctions#tablegeneratebypage) helper method. More information can be found on [Handling Paging](https://learn.microsoft.com/power-query/handlingpaging).
 
 #### Paging Behavior
 
@@ -59,7 +60,7 @@ The logic that determines when to stop fetching pages is contained in `Retrieved
 
 #### Page Size
 
-The default page size is 100 items, but it can be configured by adjusting the `pageSize` variable. There are scenarios where the `pageSize` needs to be adjusted, which is handled in `AdjustPageSizeDependingOnUsersLimit`. The `pageSize` will be reduced if a user provides a limit and it's less than the `pageSize`. The `pageSize` will also be reduced if a partial page of data is needed to satisify the user's limit.
+The default page size is 100 items, but it can be configured by adjusting the `pageSize` variable. There are scenarios where the `pageSize` needs to be adjusted, which is handled in `AdjustPageSizeDependingOnUsersLimit`. The `pageSize` will be reduced if a user provides a limit and it's less than the `pageSize`. The `pageSize` will also be reduced if a partial page of data is needed to satisfy the user's limit.
 
 ### Unit Tests
 
@@ -67,19 +68,19 @@ There are a handful of unit tests in the project that leverage the [unit test he
 
 ## Possible Features for the Future
 
-The connector supports basic search functionality, but there are some areas of improvement: 
+The connector supports basic search functionality, but there are some areas of improvement:
 
 ### Fetch records at a specified index
 
-Data retreival/paging currently starts at index 0, but it could be modified to start at any index. This could be useful if users have a large amount of data and want to fetch a subset of it. This would require modifications to the paging logic to know where to start.
+Data retrieval/paging currently starts at index 0, but it could be modified to start at any index. This could be useful if users have a large amount of data and want to fetch a subset of it. This would require modifications to the paging logic to know where to start.
 
 ### Support all search API arguments
 
-The Search API has a number of parameters to it: kind, query, offset, limit, sort, queryAsOwner, spatialFilter, trackTotalCount, aggregateBy, and returnedFields. The connector could be extended to support sort, queryAsOwner, spatialFilter, trackTotalCount, and aggregateBy. It currently makes use of kind, query, offset, liimt, and returnedFields.
+The Search API has a number of parameters to it: kind, query, offset, limit, sort, queryAsOwner, spatialFilter, trackTotalCount, aggregateBy, and returnedFields. The connector could be extended to support sort, queryAsOwner, spatialFilter, trackTotalCount, and aggregateBy. It currently makes use of kind, query, offset, limit, and returnedFields.
 
 ### Improve returnedRecords format
 
-Passing values to the returnedFields parameter is not the most userfriendly since each field needs to be enclosed in quotes. The connector could be modified to add quotations around each field, if the user doesn't provide them, before passing them to the Search API.
+Passing values to the returnedFields parameter is not the most user-friendly since each field needs to be enclosed in quotes. The connector could be modified to add quotations around each field, if the user doesn't provide them, before passing them to the Search API.
 
 ## Contributing
 
@@ -95,11 +96,10 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
-
 ## Trademarks
 
 This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft 
-trademarks or logos is subject to and must follow 
+trademarks or logos is subject to and must follow
 [Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general).
 Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship.
 Any use of third-party trademarks or logos are subject to those third-party's policies.
