@@ -52,7 +52,7 @@ The `redirectUri` variable can be any valid URI as long as the Azure AD Applicat
 
 ### Paging
 
-By default, Microsoft Energy Data Services only returns 1000 records. To get around this limitation, the connector uses the [Table.GenerateByPage](https://learn.microsoft.com/power-query/helperfunctions#tablegeneratebypage) helper method to retrieve all records. More information can be found on [Handling Paging](https://learn.microsoft.com/power-query/handlingpaging).
+Microsoft Energy Data Services only returns 1000 records by default. To get around this limitation, the connector uses the [Table.GenerateByPage](https://learn.microsoft.com/power-query/helperfunctions#tablegeneratebypage) helper method to retrieve all records. More information can be found on [Handling Paging](https://learn.microsoft.com/power-query/handlingpaging).
 
 #### Paging Behavior
 
