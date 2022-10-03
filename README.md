@@ -80,7 +80,7 @@ The Search API has a number of parameters to it: kind, query, offset, limit, sor
 
 ### Improve returnedRecords format
 
-Passing values to the returnedFields parameter is not the most user-friendly since each field needs to be enclosed in quotes. The connector could be modified to add quotations around each field, if the user doesn't provide them, before passing them to the Search API.
+Passing values to the returnedFields parameter is not the most user-friendly since each field needs to be enclosed in quotes (e.g. "data.FacilityName", "data.Source"). The connector could be modified to add quotations around each field, if the user doesn't provide them, before passing them to the Search API.
 
 ## Contributing
 
