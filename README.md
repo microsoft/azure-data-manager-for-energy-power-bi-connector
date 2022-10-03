@@ -56,7 +56,7 @@ By default, Microsoft Energy Data Services only returns 1000 records. To get aro
 
 #### Paging Behavior
 
-The logic that determines when to stop fetching pages is contained in `RetrievedAllPages`. This function will continue to retrieve pages until all items have been retrieved, or the user's optional limit was met.
+The logic that determines when to stop fetching pages is contained in `RetrievedAllPages`. This function will continue to retrieve pages until all items have been retrieved, or the user's optional limit is met.
 
 #### Page Size
 
