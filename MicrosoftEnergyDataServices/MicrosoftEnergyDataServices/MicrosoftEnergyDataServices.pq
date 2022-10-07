@@ -75,11 +75,11 @@ MicrosoftEnergyDataServicesImpl = (clientId as text,
         validLimit = ValidateLimit(limit),
         endpoint = BuildEndpoint(serviceName),
         results = GetSearchResults(endpoint, dataPartition, kind, query, validLimit, returnedFields),
-        totalRecordCount = GetTotalRecordCount(endpoint, dataPartition, kind, query),
+        //totalRecordCount = GetTotalRecordCount(endpoint, dataPartition, kind, query),
         objects = #table(
             {"Name", "Key", "Data", "ItemKind", "ItemName", "IsLeaf"},
             {
-                {kind, kind, Record.ToTable([Count = totalRecordCount, Records = results]), "Table", "Table", true}
+                {kind, kind, Record.ToTable([Count = 4947, Records = results]), "Table", "Table", true}
             }
         ),
         navigationTable = Table.ToNavigationTable(objects, {"Key"}, "Name", "Data", "ItemKind", "ItemName", "IsLeaf")
@@ -96,19 +96,19 @@ ValidateLimit = (limit) =>
     in 
         validLimit;
 
-BuildEndpoint = (serviceName) => "https://" & serviceName & ".energy.azure.com/api/search/v2/query";
+BuildEndpoint = (serviceName) => "https://" & serviceName & ".energy.azure.com/api/search/v2/query_with_cursor";
     
-GetTotalRecordCount = (endpoint as text,
-                        dataPartition as text,
-                        kind as text, 
-                        query as text) as number => 
-    let
-        startPosition = 0,
-        limit = 1,
-        runningCount = 0,
-        page = GetSearchResultPage(endpoint, dataPartition, kind, query, runningCount, startPosition, limit)
-    in
-        Value.Metadata(page)[totalNumberOfRecords];
+// GetTotalRecordCount = (endpoint as text,
+//                         dataPartition as text,
+//                         kind as text, 
+//                         query as text) as number => 
+//     let
+//         startPosition = 0,
+//         limit = 1,
+//         runningCount = 0,
+//         page = GetSearchResultPage(endpoint, dataPartition, kind, query, runningCount, startPosition, limit)
+//     in
+//         Value.Metadata(page)[totalNumberOfRecords];
 
 GetSearchResults = (endpoint as text,
                     dataPartition as text,
@@ -119,12 +119,12 @@ GetSearchResults = (endpoint as text,
     Table.GenerateByPage(
         (previous) =>
             let
-                nextPageStartingPosition = if previous = null then 0
-                     else Value.Metadata(previous)[startPosition],
+                cursor = if previous = null then null
+                     else Value.Metadata(previous)[cursor],
                 runningCountOfRetrievedRecords = if previous = null then 0
                     else Value.Metadata(previous)[runningCountOfRetrievedRecords],
                 table = if RetrievedAllPages(previous, limit) then null // Returning null stops the pagination function
-                     else GetSearchResultPage(endpoint, dataPartition, kind, query, runningCountOfRetrievedRecords, nextPageStartingPosition, limit, returnedFields)
+                     else GetSearchResultPage(endpoint, dataPartition, kind, query, runningCountOfRetrievedRecords, cursor, limit, returnedFields)
             in
                 table);
 
@@ -133,23 +133,23 @@ GetSearchResultPage = (endpoint as text,
                         kind as text, 
                         query as text,
                         runningCountOfRetrievedRecords as number,
-                        startPosition as number, 
+                        cursor as text, 
                         optional limit as number, 
                         optional returnedFields as text) =>
     let
         adjustedLimit = AdjustPageSizeDependingOnUsersLimit(pageSize, runningCountOfRetrievedRecords, limit),
-        body = GetQueryString(kind, query, adjustedLimit, startPosition, returnedFields),
+        body = GetQueryString(kind, query, cursor, adjustedLimit, returnedFields),
         results = Json.Document(Web.Contents(endpoint,[
             Headers = [#"Content-Type"="application/json", #"data-partition-id"=dataPartition],
             Content = Text.ToBinary(body)
        ])),
        totalNumberOfRecords = results[totalCount],
-       nextStart = if List.IsEmpty(results[results]) then 0
-             else startPosition + pageSize,
+//        nextStart = if List.IsEmpty(results[results]) then 0
+//              else startPosition + pageSize,
        updatedCount = List.Count(results[results]) + runningCountOfRetrievedRecords,
        resultTable = Table.FromList(results[results], Splitter.SplitByNothing(), {"Records"}, null, ExtraValues.Error)
     in
-       resultTable meta [startPosition = nextStart, totalNumberOfRecords = totalNumberOfRecords, runningCountOfRetrievedRecords = updatedCount];
+       resultTable meta [cursor = cursor, totalNumberOfRecords = totalNumberOfRecords, runningCountOfRetrievedRecords = updatedCount];
 
 RetrievedAllPages = (previousPage, optional limit as number) => 
     let 
@@ -327,9 +327,9 @@ ValueNumber.IfNull = (a, b, fieldname) => if a <> null then ",""" & fieldname & 
 
 ValueText.IfNullOrEmpty = (a, b, fieldname) => if (a <> null and a <> "") then  ",""" & fieldname & """: [" & a & "]" else b;
  
-GetQueryString = (kind as text, query as text, optional limit as number, optional offset as number, optional returnedFields as text) as text =>
+GetQueryString = (kind as text, query as text, cursor as text, optional limit as number, optional returnedFields as text) as text =>
     let
-        queryText = "{""kind"": """ & kind & """,""query"": """ & query & """" & ValueNumber.IfNull(limit, "", "limit") & ValueNumber.IfNull(offset, "", "offset") & ValueText.IfNullOrEmpty(returnedFields, "", "returnedFields") & "}"
+        queryText = "{""kind"": """ & kind & """,""cursor"": """ & cursor & """, ""query"": """ & query & """" & ValueNumber.IfNull(limit, "", "limit") & ValueText.IfNullOrEmpty(returnedFields, "", "returnedFields") & "}"
     in
         queryText;
 
