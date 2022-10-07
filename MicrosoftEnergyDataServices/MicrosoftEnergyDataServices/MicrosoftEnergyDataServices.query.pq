@@ -4,6 +4,7 @@
 [Version="1.0.0"]
 section MicrosoftEnergyDataServicesTests;
 
+// Tests must be run against an instance that's completed a TNO data load: https://github.com/Azure/osdu-data-load-tno
 clientId = "<client id>";
 tenantId = "<tenant id>";
 instanceName = "<Microsoft Energy Data Services instance name>";
@@ -138,7 +139,15 @@ shared MicrosoftEnergyDataServices.Test =
                                          datapatition,
                                          kind,
                                          query,
-                                         150)))
+                                         150))),
+        Fact("Check that all paged records are unique",
+            true,
+            List.IsDistinct(GetRecordIds(MicrosoftEnergyDataServices.Search(clientId,
+                                         tenantId,
+                                         instanceName,
+                                         datapatition,
+                                         kind,
+                                         query))))
     },
     report = Facts.Summarize(facts)
 ][report];
@@ -148,6 +157,12 @@ GetTotalCount = (result as table) =>
 
 GetNumberOfRows = (result as table) => 
     Table.RowCount(result{[Key=kind]}[Data]{[Name="Records"]}[Value]);
+
+GetRecordIds = (result as table) => 
+    let
+        records = result{[Key=kind]}[Data]{[Name="Records"]}[Value]
+    in
+        Table.ExpandRecordColumn(records, "Records", {"id"}, {"id"})[id];
 
 /// COMMON UNIT TESTING CODE 
 Fact = (_subject as text, _expected, _actual) as record =>
