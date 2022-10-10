@@ -52,7 +52,7 @@ The `redirectUri` variable can be any valid URI as long as the Azure AD Applicat
 
 ### Paging
 
-Microsoft Energy Data Services only returns 1000 records by default. To get around this limitation, the connector uses the [Table.GenerateByPage](https://learn.microsoft.com/power-query/helperfunctions#tablegeneratebypage) helper method to retrieve all records. More information can be found on [Handling Paging](https://learn.microsoft.com/power-query/handlingpaging).
+Microsoft Energy Data Services only returns a maximum of 1000 records from [query_with_cursor](https://community.opengroup.org/osdu/platform/system/search-service/-/blob/master/docs/tutorial/SearchService.md#query-with-cursor). To get around this limitation, the connector uses the [Table.GenerateByPage](https://learn.microsoft.com/power-query/helperfunctions#tablegeneratebypage) helper method to retrieve all records. More information can be found on [Handling Paging](https://learn.microsoft.com/power-query/handlingpaging).
 
 #### Paging Behavior
 
@@ -60,7 +60,9 @@ The logic that determines when to stop fetching pages is contained in `Retrieved
 
 #### Page Size
 
-The default page size is 100 items, but it can be configured by adjusting the `pageSize` variable. There are scenarios where the `pageSize` needs to be adjusted, which is handled in `AdjustPageSizeDependingOnUsersLimit`. The `pageSize` will be reduced if a user provides a limit and it's less than the `pageSize`. The `pageSize` will also be reduced if a partial page of data is needed to satisfy the user's limit.
+The default page size is 100 items, but it can be configured by adjusting the `pageSize` variable. There are scenarios where the `pageSize` needs to be adjusted, which is handled in `AdjustPageSizeDependingOnUsersLimit`. The `pageSize` will be reduced if a user provides a limit and it's less than the `pageSize`.
+
+The query_with_cursor API does not respect changing `limits` (i.e. it will use whatever limit was specified when the cursor was created). If the final page size needs to be reduced to satisfy a user's limit, then logic in `GetSubsetOfRecordsIfNecessary` will keep only a subset of records from the final page.
 
 ### Unit Tests
 
@@ -70,17 +72,13 @@ There are a handful of unit tests in the project that leverage the [unit test he
 
 The connector supports basic search functionality, but there are some areas of improvement:
 
-### Fetch records at a specified index
-
-Data retrieval/paging currently starts at index 0, but it could be modified to start at any index. This could be useful if users have a large amount of data and want to fetch a subset of it. This would require modifications to the paging logic to know where to start.
-
 ### Support all search API arguments
 
 The Search API has a number of parameters to it: kind, query, offset, limit, sort, queryAsOwner, spatialFilter, trackTotalCount, aggregateBy, and returnedFields. The connector could be extended to support sort, queryAsOwner, spatialFilter, trackTotalCount, and aggregateBy. It currently makes use of kind, query, offset, limit, and returnedFields.
 
 ### Improve returnedRecords format
 
-Passing values to the returnedFields parameter is not the most user-friendly since each field needs to be enclosed in quotes (e.g. "data.FacilityName", "data.Source"). The connector could be modified to add quotations around each field, if the user doesn't provide them, before passing them to the Search API.
+Passing values to the returnedFields parameter is not the most user-friendly since each field needs to be enclosed in quotes (e.g. "data.FacilityName", "data.Source"). The connector could be modified to automatically add quotations around each field if the user doesn't include them.
 
 ## Contributing
 

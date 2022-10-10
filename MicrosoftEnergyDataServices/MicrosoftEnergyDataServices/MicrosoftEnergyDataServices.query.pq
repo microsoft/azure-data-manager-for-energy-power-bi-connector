@@ -147,7 +147,37 @@ shared MicrosoftEnergyDataServices.Test =
                                          instanceName,
                                          datapatition,
                                          kind,
-                                         query))))
+                                         query)))),
+        Fact("Check that all paged records are unique when there is a limit",
+            true,
+            List.IsDistinct(GetRecordIds(MicrosoftEnergyDataServices.Search(clientId,
+                                         tenantId,
+                                         instanceName,
+                                         datapatition,
+                                         kind,
+                                         query,
+                                         150)))),
+        Fact("Check that the number of returnedFields is correct",
+            1,
+            GetNumberOfRecordProperties(MicrosoftEnergyDataServices.Search(clientId,
+                                         tenantId,
+                                         instanceName,
+                                         datapatition,
+                                         kind,
+                                         query,
+                                         10,
+                                         """id"""))),
+        Fact("Check that the record's fields are projected to returnedFields",
+            true,
+            FirstRecordHasField(MicrosoftEnergyDataServices.Search(clientId,
+                                         tenantId,
+                                         instanceName,
+                                         datapatition,
+                                         kind,
+                                         query,
+                                         10,
+                                         """id"""),
+                                "id"))
     },
     report = Facts.Summarize(facts)
 ][report];
@@ -163,6 +193,19 @@ GetRecordIds = (result as table) =>
         records = result{[Key=kind]}[Data]{[Name="Records"]}[Value]
     in
         Table.ExpandRecordColumn(records, "Records", {"id"}, {"id"})[id];
+
+GetNumberOfRecordProperties = (result as table) => 
+    let
+        records = result{[Key="osdu:wks:master-data--Well:1.0.0"]}[Data]{[Name="Records"]}[Value],
+        recordProperties = Record.ToList(records{0}[Records])
+    in
+        List.Count(recordProperties);
+
+FirstRecordHasField = (result as table, field as text) => 
+    let
+        records = result{[Key="osdu:wks:master-data--Well:1.0.0"]}[Data]{[Name="Records"]}[Value]
+    in
+        Record.HasFields(records{0}[Records], field);
 
 /// COMMON UNIT TESTING CODE 
 Fact = (_subject as text, _expected, _actual) as record =>
