@@ -6,7 +6,7 @@ section MicrosoftEnergyDataServices;
 
 redirectUri = "https://oauth.powerbi.com/views/oauthredirect.html"; // Must be a platform that supports PKCE (Single Page Application)
 logoutUri = "https://login.microsoftonline.com/logout.srf";
-pageSize = 1000;
+pageSize = 100;
 
 [DataSource.Kind="MicrosoftEnergyDataServices", Publish="MicrosoftEnergyDataServices.Publish"]
 shared MicrosoftEnergyDataServices.Search = Value.ReplaceType(MicrosoftEnergyDataServicesImpl, MicrosoftEnergyDataServicesType);
@@ -145,7 +145,7 @@ GetSearchResultPage = (endpoint as text,
        ])),
        totalNumberOfRecords = results[totalCount],
        returnedCursor = GetReturnedCursor(results),
-       records = results[results],//GetSubsetOfRecordsIfNecessary(results[results], runningCountOfRetrievedRecords, limit),
+       records = GetSubsetOfRecordsIfNecessary(results[results], runningCountOfRetrievedRecords, limit),
        updatedCount = List.Count(records) + runningCountOfRetrievedRecords,
        resultTable = Table.FromList(records, Splitter.SplitByNothing(), {"Records"}, null, ExtraValues.Error)
     in
@@ -155,7 +155,7 @@ GetSubsetOfRecordsIfNecessary = (records as list, runningCountOfRetrievedRecords
     let
         numberOfReturnedRecords = List.Count(records),
         endingIndex = limit - runningCountOfRetrievedRecords,
-        updatedRecords = if not (limit = null) and (runningCountOfRetrievedRecords + numberOfReturnedRecords > limit) then // User specified limit and keeping all returned records puts the retreived record count over limit
+        updatedRecords = if not (limit = null) and not (limit = 0) and (runningCountOfRetrievedRecords + numberOfReturnedRecords > limit) then // User specified limit and keeping all returned records puts the retreived record count over limit
                             List.Range(records, 0, endingIndex) // Get a range of records to prevent going over the user's limit
                          else
                             records
@@ -320,7 +320,6 @@ TokenMethod = (dataSourcePath, code, grant_type, optional verifier) =>
         ],
  
         // Set this if your API returns a non-2xx status for login failures
-        // ManualHandlingStatusCodes = {400, 403}
         ManualHandlingStatusCodes= {400},
         
         Response = Web.Contents(GetAuthenticationBaseUrl(dataSourcePath) & "/token", [
