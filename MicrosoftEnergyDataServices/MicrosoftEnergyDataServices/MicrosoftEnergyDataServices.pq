@@ -227,7 +227,7 @@ MicrosoftEnergyDataServices.Publish = [
     Beta = true,
     Category = "Other",
     ButtonText = { Extension.LoadString("buttonTitle"), Extension.LoadString("buttonHelp") },
-    LearnMoreUrl = "https://learn.microsoft.com/en-us/azure/energy-data-services/",
+    LearnMoreUrl = "https://learn.microsoft.com/azure/energy-data-services/",
     SourceImage = MicrosoftEnergyDataServices.Icons,
     SourceTypeImage = MicrosoftEnergyDataServices.Icons
 ];
