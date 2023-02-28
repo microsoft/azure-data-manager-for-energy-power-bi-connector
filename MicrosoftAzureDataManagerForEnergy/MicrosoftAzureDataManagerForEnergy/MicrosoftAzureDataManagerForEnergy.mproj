@@ -19,7 +19,7 @@
     <SuppressCellErrors>False</SuppressCellErrors>
     <MaxRows>infinite</MaxRows>
     <ExtensionProject>Yes</ExtensionProject>
-    <Name>MicrosoftEnergyDataServices</Name>
+    <Name>MicrosoftAzureDataManagerForEnergy</Name>
     <ThrowOnFoldingFailure>False</ThrowOnFoldingFailure>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -38,37 +38,37 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MicrosoftEnergyDataServices.pq">
+    <Compile Include="MicrosoftAzureDataManagerForEnergy.pq">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MicrosoftEnergyDataServices16.png">
+    <Compile Include="MicrosoftAzureDataManagerForEnergy16.png">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MicrosoftEnergyDataServices20.png">
+    <Compile Include="MicrosoftAzureDataManagerForEnergy20.png">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MicrosoftEnergyDataServices24.png">
+    <Compile Include="MicrosoftAzureDataManagerForEnergy24.png">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MicrosoftEnergyDataServices32.png">
+    <Compile Include="MicrosoftAzureDataManagerForEnergy32.png">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MicrosoftEnergyDataServices40.png">
+    <Compile Include="MicrosoftAzureDataManagerForEnergy40.png">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MicrosoftEnergyDataServices48.png">
+    <Compile Include="MicrosoftAzureDataManagerForEnergy48.png">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MicrosoftEnergyDataServices64.png">
+    <Compile Include="MicrosoftAzureDataManagerForEnergy64.png">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MicrosoftEnergyDataServices80.png">
+    <Compile Include="MicrosoftAzureDataManagerForEnergy80.png">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="resources.resx">
       <SubType>Code</SubType>
     </Compile>
-    <Content Include="MicrosoftEnergyDataServices.query.pq">
+    <Content Include="MicrosoftAzureDataManagerForEnergy.query.pq">
       <SubType>Code</SubType>
     </Content>
   </ItemGroup>

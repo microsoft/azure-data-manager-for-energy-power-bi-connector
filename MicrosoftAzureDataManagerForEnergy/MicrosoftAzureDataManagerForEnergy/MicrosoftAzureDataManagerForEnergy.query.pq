@@ -2,24 +2,24 @@
 // Licensed under the MIT License.
 
 [Version="1.0.0"]
-section MicrosoftEnergyDataServicesTests;
+section MicrosoftAzureDataManagerForEnergyTests;
 
 // Tests must be run against an instance that's completed a TNO data load: https://github.com/Azure/osdu-data-load-tno
 clientId = "<client id>";
 tenantId = "<tenant id>";
-instanceName = "<Microsoft Energy Data Services instance name>";
+instanceName = "<Microsoft Azure Data Manager for Energy instance name>";
 datapatition = "<data patition ID>";
 kind = "osdu:wks:master-data--Well:1.0.0";
 query = "*";
 
-shared MicrosoftEnergyDataServices.Test = 
+shared MicrosoftAzureDataManagerForEnergy.Test = 
 [
     // Fact(<Name of the Test>, <Expected Value>, <Actual Value>)
     facts = 
     {
         Fact("Check that total record count is calculated when there is no limit",
             4947,
-            GetTotalCount(MicrosoftEnergyDataServices.Search(clientId,
+            GetTotalCount(MicrosoftAzureDataManagerForEnergy.Search(clientId,
                                          tenantId,
                                          instanceName,
                                          datapatition,
@@ -27,7 +27,7 @@ shared MicrosoftEnergyDataServices.Test =
                                          query))),
         Fact("Check that total record count is calculated there is a limit",
             4947,
-            GetTotalCount(MicrosoftEnergyDataServices.Search(clientId,
+            GetTotalCount(MicrosoftAzureDataManagerForEnergy.Search(clientId,
                                          tenantId,
                                          instanceName,
                                          datapatition,
@@ -36,7 +36,7 @@ shared MicrosoftEnergyDataServices.Test =
                                          204))),
         Fact("Check that correct number of records are retrieved when there is no limit",
             4947,
-            GetNumberOfRows(MicrosoftEnergyDataServices.Search(clientId,
+            GetNumberOfRows(MicrosoftAzureDataManagerForEnergy.Search(clientId,
                                          tenantId,
                                          instanceName,
                                          datapatition,
@@ -44,7 +44,7 @@ shared MicrosoftEnergyDataServices.Test =
                                          query))),
         Fact("Check that correct number of records are retrieved when there is a query",
             4947,
-            GetNumberOfRows(MicrosoftEnergyDataServices.Search(clientId,
+            GetNumberOfRows(MicrosoftAzureDataManagerForEnergy.Search(clientId,
                                          tenantId,
                                          instanceName,
                                          datapatition,
@@ -52,7 +52,7 @@ shared MicrosoftEnergyDataServices.Test =
                                          "type:master-data--Well"))),
        Fact("Check that correct number of records are retrieved when there is a query and a limit",
             2,
-            GetNumberOfRows(MicrosoftEnergyDataServices.Search(clientId,
+            GetNumberOfRows(MicrosoftAzureDataManagerForEnergy.Search(clientId,
                                          tenantId,
                                          instanceName,
                                          datapatition,
@@ -61,7 +61,7 @@ shared MicrosoftEnergyDataServices.Test =
                                          2))),
         Fact("Check that correct number of records are retrieved when the limit is greater than the service's max page size",
             1500,
-            GetNumberOfRows(MicrosoftEnergyDataServices.Search(clientId,
+            GetNumberOfRows(MicrosoftAzureDataManagerForEnergy.Search(clientId,
                                          tenantId,
                                          instanceName,
                                          datapatition,
@@ -70,7 +70,7 @@ shared MicrosoftEnergyDataServices.Test =
                                          1500))),
         Fact("Check that correct number of records are retrieved when the limit equals the service's max page size",
             1000,
-            GetNumberOfRows(MicrosoftEnergyDataServices.Search(clientId,
+            GetNumberOfRows(MicrosoftAzureDataManagerForEnergy.Search(clientId,
                                          tenantId,
                                          instanceName,
                                          datapatition,
@@ -79,7 +79,7 @@ shared MicrosoftEnergyDataServices.Test =
                                          1000))),
         Fact("Check that correct number of records are retrieved when the limit is equal to the connectors's page size",
             100,
-            GetNumberOfRows(MicrosoftEnergyDataServices.Search(clientId,
+            GetNumberOfRows(MicrosoftAzureDataManagerForEnergy.Search(clientId,
                                          tenantId,
                                          instanceName,
                                          datapatition,
@@ -88,7 +88,7 @@ shared MicrosoftEnergyDataServices.Test =
                                          100))),
         Fact("Check that correct number of records are retrieved when the limit is less than the connectors's page size",
             10,
-            GetNumberOfRows(MicrosoftEnergyDataServices.Search(clientId,
+            GetNumberOfRows(MicrosoftAzureDataManagerForEnergy.Search(clientId,
                                          tenantId,
                                          instanceName,
                                          datapatition,
@@ -97,7 +97,7 @@ shared MicrosoftEnergyDataServices.Test =
                                          10))),
         Fact("Check that correct number of records are retrieved when the limit is equal to the total count",
             4947,
-            GetNumberOfRows(MicrosoftEnergyDataServices.Search(clientId,
+            GetNumberOfRows(MicrosoftAzureDataManagerForEnergy.Search(clientId,
                                          tenantId,
                                          instanceName,
                                          datapatition,
@@ -106,7 +106,7 @@ shared MicrosoftEnergyDataServices.Test =
                                          4947))),
         Fact("Check that correct number of records are retrieved when the limit is greater than the total count",
             4947,
-            GetNumberOfRows(MicrosoftEnergyDataServices.Search(clientId,
+            GetNumberOfRows(MicrosoftAzureDataManagerForEnergy.Search(clientId,
                                          tenantId,
                                          instanceName,
                                          datapatition,
@@ -114,8 +114,8 @@ shared MicrosoftEnergyDataServices.Test =
                                          query,
                                          5000))),
         Fact("Check that correct number of records are retrieved when the limit is 0",
-            10, // Microsoft Energy Data Services will default to 10 if the limit is 0
-            GetNumberOfRows(MicrosoftEnergyDataServices.Search(clientId,
+            10, // Microsoft Azure Data Manager for Energy will default to 10 if the limit is 0
+            GetNumberOfRows(MicrosoftAzureDataManagerForEnergy.Search(clientId,
                                          tenantId,
                                          instanceName,
                                          datapatition,
@@ -124,7 +124,7 @@ shared MicrosoftEnergyDataServices.Test =
                                          0))),
         Fact("Check that a partial final page, where the difference in limit and page size is greater than the page size, retrieves the correct number of records",
             204,
-            GetNumberOfRows(MicrosoftEnergyDataServices.Search(clientId,
+            GetNumberOfRows(MicrosoftAzureDataManagerForEnergy.Search(clientId,
                                          tenantId,
                                          instanceName,
                                          datapatition,
@@ -133,7 +133,7 @@ shared MicrosoftEnergyDataServices.Test =
                                          204))),
         Fact("Check that a partial final page, where the difference in limit and page size is less than the page size, retrieves the correct number of records",
             150,
-            GetNumberOfRows(MicrosoftEnergyDataServices.Search(clientId,
+            GetNumberOfRows(MicrosoftAzureDataManagerForEnergy.Search(clientId,
                                          tenantId,
                                          instanceName,
                                          datapatition,
@@ -142,7 +142,7 @@ shared MicrosoftEnergyDataServices.Test =
                                          150))),
         Fact("Check that all paged records are unique",
             true,
-            List.IsDistinct(GetRecordIds(MicrosoftEnergyDataServices.Search(clientId,
+            List.IsDistinct(GetRecordIds(MicrosoftAzureDataManagerForEnergy.Search(clientId,
                                          tenantId,
                                          instanceName,
                                          datapatition,
@@ -150,7 +150,7 @@ shared MicrosoftEnergyDataServices.Test =
                                          query)))),
         Fact("Check that all paged records are unique when there is a limit",
             true,
-            List.IsDistinct(GetRecordIds(MicrosoftEnergyDataServices.Search(clientId,
+            List.IsDistinct(GetRecordIds(MicrosoftAzureDataManagerForEnergy.Search(clientId,
                                          tenantId,
                                          instanceName,
                                          datapatition,
@@ -159,7 +159,7 @@ shared MicrosoftEnergyDataServices.Test =
                                          150)))),
         Fact("Check that the number of returnedFields is correct",
             1,
-            GetNumberOfRecordProperties(MicrosoftEnergyDataServices.Search(clientId,
+            GetNumberOfRecordProperties(MicrosoftAzureDataManagerForEnergy.Search(clientId,
                                          tenantId,
                                          instanceName,
                                          datapatition,
@@ -169,7 +169,7 @@ shared MicrosoftEnergyDataServices.Test =
                                          """id"""))),
         Fact("Check that the record's fields are projected to returnedFields",
             true,
-            FirstRecordHasField(MicrosoftEnergyDataServices.Search(clientId,
+            FirstRecordHasField(MicrosoftAzureDataManagerForEnergy.Search(clientId,
                                          tenantId,
                                          instanceName,
                                          datapatition,

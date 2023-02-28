@@ -1,8 +1,8 @@
-# Microsoft Energy Data Services Power BI Connector
+# Microsoft Azure Data Manager for Energy Power BI Connector
 
 ## About
 
-This project is the Microsoft Energy Data Services Power BI connector. The connector is used to query data from a Microsoft Energy Data Services instance and display it in Power BI reports.
+This project is the Microsoft Azure Data Manager for Energy Power BI connector. The connector is used to query data from a Azure Data Manager for Energy instance and display it in Power BI reports.
 
 ## Development Machine Setup
 
@@ -13,9 +13,9 @@ You will need Visual Studio 2019 and the Power Query SDK to compile the project.
 
 ## Testing the Connector
 
-To test the connector you must configure your Microsoft Energy Data Services instance, and connector first.
+To test the connector you must configure your Azure Data Manager for Energy instance, and connector first.
 
-### Configuring Microsoft Energy Data Services
+### Configuring Azure Data Manager for Energy
 
 Add the below URI as a Single Page Application (SPA) redirect URI to your AD Application
 
@@ -23,18 +23,18 @@ Add the below URI as a Single Page Application (SPA) redirect URI to your AD App
 
 ### Configuring the Connector
 
-Provide a client ID, tenant ID, Microsoft Energy Data Services instance name, and data partition ID in [MicrosoftEnergyDataServices.query.pq](./MicrosoftEnergyDataServices/MicrosoftEnergyDataServices/MicrosoftEnergyDataServices.query.pq). Once this is done, you can run the connector by pressing the Run button or F5.
+Provide a client ID, tenant ID, Azure Data Manager for Energy instance name, and data partition ID in [MicrosoftAzureDataManagerForEnergy.query.pq](./MicrosoftAzureDataManagerForEnergy/MicrosoftAzureDataManagerForEnergy/MicrosoftAzureDataManagerForEnergy.query.pq). Once this is done, you can run the connector by pressing the Run button or F5.
 
 ### Using the Sample Report
 
 There is a sample template report that can be used to test your connection. The connection details need to be updated with the following steps:
 
-1. Open [Microsoft Energy Data Services Wells Template.pbit](./Reports/Microsoft%20Energy%20Data%20Services%20Wells%20Template.pbit)
+1. Open [Microsoft Azure Data Manager for Energy Wells Template.pbit](./Reports/Microsoft%20Azure%20Data%20Manager%20for%20Energy%20Wells%20Template.pbit)
 1. Close the authentication prompt
 1. Close the error dialog
 1. Edit the 'Wells' query
 1. Edit the 'Source' step
-1. Input your client ID, tenant ID, Microsoft Energy Data Services instance name, and data partition ID
+1. Input your client ID, tenant ID, Azure Data Manager for Energy instance name, and data partition ID
 1. Click 'OK'
 1. Click 'Close & Apply'
 
@@ -52,7 +52,7 @@ The `redirectUri` variable can be any valid URI as long as the Azure AD Applicat
 
 ### Paging
 
-Microsoft Energy Data Services only returns a maximum of 1000 records from [query_with_cursor](https://community.opengroup.org/osdu/platform/system/search-service/-/blob/master/docs/tutorial/SearchService.md#query-with-cursor). To get around this limitation, the connector uses the [Table.GenerateByPage](https://learn.microsoft.com/power-query/helperfunctions#tablegeneratebypage) helper method to retrieve all records. More information can be found on [Handling Paging](https://learn.microsoft.com/power-query/handlingpaging).
+Azure Data Manager for Energy only returns a maximum of 1000 records from [query_with_cursor](https://community.opengroup.org/osdu/platform/system/search-service/-/blob/master/docs/tutorial/SearchService.md#query-with-cursor). To get around this limitation, the connector uses the [Table.GenerateByPage](https://learn.microsoft.com/power-query/helperfunctions#tablegeneratebypage) helper method to retrieve all records. More information can be found on [Handling Paging](https://learn.microsoft.com/power-query/handlingpaging).
 
 #### Paging Behavior
 
