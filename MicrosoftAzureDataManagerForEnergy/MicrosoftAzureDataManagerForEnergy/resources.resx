@@ -118,34 +118,34 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="buttonHelp" xml:space="preserve">
-    <value>Connect to Microsoft Energy Data Services</value>
+    <value>Connect to Microsoft Azure Data Manager for Energy</value>
   </data>
   <data name="buttonTitle" xml:space="preserve">
-    <value>Microsoft Energy Data Services</value>
+    <value>Microsoft Azure Data Manager for Energy</value>
   </data>
   <data name="clientIdFieldCaption" xml:space="preserve">
     <value>Azure AD Application Client ID</value>
   </data>
   <data name="clientIdFieldDescription" xml:space="preserve">
-    <value>The ID of the Azure AD Application used to create the Microsoft Energy Data Services instance</value>
+    <value>The ID of the Azure AD Application used to create the Microsoft Azure Data Manager for Energy instance</value>
   </data>
   <data name="dataPartitionFieldCaption" xml:space="preserve">
     <value>Data Partition</value>
   </data>
   <data name="dataPartitionFieldDescription" xml:space="preserve">
-    <value>The ID of the Microsoft Energy Data Services data partition</value>
+    <value>The ID of the Microsoft Azure Data Manager for Energy data partition</value>
   </data>
   <data name="dataPartitionSampleValues" xml:space="preserve">
     <value>platform4321-opendes</value>
   </data>
   <data name="dataSourceLabel" xml:space="preserve">
-    <value>Microsoft Energy Data Services</value>
+    <value>Microsoft Azure Data Manager for Energy</value>
   </data>
   <data name="documentationLongDescription" xml:space="preserve">
-    <value>Queries for records in the Microsoft Energy Data Services instance</value>
+    <value>Queries for records in the Microsoft Azure Data Manager for Energy instance</value>
   </data>
   <data name="documentationName" xml:space="preserve">
-    <value>Microsoft Energy Data Services Search</value>
+    <value>Microsoft Azure Data Manager for Energy Search</value>
   </data>
   <data name="errorNegativeLimit" xml:space="preserve">
     <value>Limit cannot be negative</value>
@@ -181,10 +181,10 @@
     <value>The fields on which to project the results</value>
   </data>
   <data name="serviceNameFieldCaption" xml:space="preserve">
-    <value>Microsoft Energy Data Services Name</value>
+    <value>Microsoft Azure Data Manager for Energy Name</value>
   </data>
   <data name="serviceNameFieldDescription" xml:space="preserve">
-    <value>Name of the Microsoft Energy Data Services instance</value>
+    <value>Name of the Microsoft Azure Data Manager for Energy instance</value>
   </data>
   <data name="serviceNameSampleValues" xml:space="preserve">
     <value>platform4321</value>

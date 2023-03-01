@@ -2,16 +2,16 @@
 // Licensed under the MIT License.
 
 [Version="1.0.0"]
-section MicrosoftEnergyDataServices;
+section MicrosoftAzureDataManagerForEnergy;
 
 redirectUri = "https://oauth.powerbi.com/views/oauthredirect.html"; // Must be a platform that supports PKCE (Single Page Application)
 logoutUri = "https://login.microsoftonline.com/logout.srf";
 pageSize = 100;
 
-[DataSource.Kind="MicrosoftEnergyDataServices", Publish="MicrosoftEnergyDataServices.Publish"]
-shared MicrosoftEnergyDataServices.Search = Value.ReplaceType(MicrosoftEnergyDataServicesImpl, MicrosoftEnergyDataServicesType);
+[DataSource.Kind="MicrosoftAzureDataManagerForEnergy", Publish="MicrosoftAzureDataManagerForEnergy.Publish"]
+shared MicrosoftAzureDataManagerForEnergy.Search = Value.ReplaceType(MicrosoftAzureDataManagerForEnergyImpl, MicrosoftAzureDataManagerForEnergyType);
 
-MicrosoftEnergyDataServicesType = type function (
+MicrosoftAzureDataManagerForEnergyType = type function (
     clientId as (type text meta [
         Documentation.FieldCaption = Extension.LoadString("clientIdFieldCaption"),
         Documentation.FieldDescription = Extension.LoadString("clientIdFieldDescription"),
@@ -57,12 +57,12 @@ MicrosoftEnergyDataServicesType = type function (
         Documentation.LongDescription = Extension.LoadString("documentationLongDescription"),
         Documentation.Examples = {[
             Description = Extension.LoadString("exampleDescription"),
-            Code = "MicrosoftEnergyDataServices.Search(""fb82bc98-a537-4c2b-a4ed-cf7c53eed5f9"", ""4b12b551-b235-46b3-9f79-6a61adc75b6a"", ""platform4321"", ""platform4321-opendes"", ""osdu:wks:master-data--Well:1.0.0"", ""*"", 2, null)",
+            Code = "MicrosoftAzureDataManagerForEnergy.Search(""fb82bc98-a537-4c2b-a4ed-cf7c53eed5f9"", ""4b12b551-b235-46b3-9f79-6a61adc75b6a"", ""platform4321"", ""platform4321-opendes"", ""osdu:wks:master-data--Well:1.0.0"", ""*"", 2, null)",
             Result = Extension.LoadString("exampleResult")
         ]}
     ];
 
-MicrosoftEnergyDataServicesImpl = (clientId as text, 
+MicrosoftAzureDataManagerForEnergyImpl = (clientId as text, 
                                       tenantId as text, 
                                       serviceName as text, 
                                       dataPartition as text,
@@ -179,7 +179,7 @@ RetrievedAllPages = (previousPage, optional limit as number) =>
             else
                 if collectedItems = totalItems then // Retrieved all records, regardless of user's limit
                     true
-                else if not (limit = null) and collectedItems >= limit then // User specified limit and we retrieved that many records. Using >= comparison in case user specified 0 limit - Microsoft Energy Data Services will default to 10 in that case
+                else if not (limit = null) and collectedItems >= limit then // User specified limit and we retrieved that many records. Using >= comparison in case user specified 0 limit - Azure Data Manager for Energy will default to 10 in that case
                     true
                 else // We have more records to retrieve beause we haven't retrieved them all yet, or we haven't reached the user's optional limit
                     false
@@ -200,7 +200,7 @@ AdjustPageSizeDependingOnUsersLimit = (runningCountOfRetrievedRecords as number,
     in
         adjustedLimit;
 
-MicrosoftEnergyDataServices = [
+MicrosoftAzureDataManagerForEnergy = [
     TestConnection = (dataSourcePath) =>
         let
             json = Json.Document(dataSourcePath),
@@ -211,7 +211,7 @@ MicrosoftEnergyDataServices = [
             kind = json[kind],
             query = json[query]
         in
-            { "MicrosoftEnergyDataServices.Search", clientId, tenantId, serviceName, dataPartition, kind, query },
+            { "MicrosoftAzureDataManagerForEnergy.Search", clientId, tenantId, serviceName, dataPartition, kind, query },
     Authentication = [
         OAuth = [
             StartLogin=StartLogin,
@@ -223,18 +223,18 @@ MicrosoftEnergyDataServices = [
     Label = Extension.LoadString("dataSourceLabel")
 ];
 
-MicrosoftEnergyDataServices.Publish = [
+MicrosoftAzureDataManagerForEnergy.Publish = [
     Beta = true,
     Category = "Azure",
     ButtonText = { Extension.LoadString("buttonTitle"), Extension.LoadString("buttonHelp") },
     LearnMoreUrl = "https://learn.microsoft.com/azure/energy-data-services/",
-    SourceImage = MicrosoftEnergyDataServices.Icons,
-    SourceTypeImage = MicrosoftEnergyDataServices.Icons
+    SourceImage = MicrosoftAzureDataManagerForEnergy.Icons,
+    SourceTypeImage = MicrosoftAzureDataManagerForEnergy.Icons
 ];
 
-MicrosoftEnergyDataServices.Icons = [
-    Icon16 = { Extension.Contents("MicrosoftEnergyDataServices16.png"), Extension.Contents("MicrosoftEnergyDataServices20.png"), Extension.Contents("MicrosoftEnergyDataServices24.png"), Extension.Contents("MicrosoftEnergyDataServices32.png") },
-    Icon32 = { Extension.Contents("MicrosoftEnergyDataServices32.png"), Extension.Contents("MicrosoftEnergyDataServices40.png"), Extension.Contents("MicrosoftEnergyDataServices48.png"), Extension.Contents("MicrosoftEnergyDataServices64.png") }
+MicrosoftAzureDataManagerForEnergy.Icons = [
+    Icon16 = { Extension.Contents("MicrosoftAzureDataManagerForEnergy16.png"), Extension.Contents("MicrosoftAzureDataManagerForEnergy20.png"), Extension.Contents("MicrosoftAzureDataManagerForEnergy24.png"), Extension.Contents("MicrosoftAzureDataManagerForEnergy32.png") },
+    Icon32 = { Extension.Contents("MicrosoftAzureDataManagerForEnergy32.png"), Extension.Contents("MicrosoftAzureDataManagerForEnergy40.png"), Extension.Contents("MicrosoftAzureDataManagerForEnergy48.png"), Extension.Contents("MicrosoftAzureDataManagerForEnergy64.png") }
 ];
 
 Base64UrlEncode = (toConvert as binary) as text =>
