@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-
+// TEST
 [Version="1.0.0"]
 section MicrosoftAzureDataManagerForEnergy;
 
