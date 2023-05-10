@@ -46,6 +46,11 @@ description: Includes basic information, prerequisites, and information on how t
 
 2. Follow [Allow Uncertified Connectors in Power BI Desktop](https://learn.microsoft.com/power-bi/connect-data/desktop-connector-extensibility#custom-connectors)
 
+> [!IMPORTANT]
+> You may not see the connector if you downloaded Power BI from the Microsoft Store. Use the [installer](https://www.microsoft.com/download/details.aspx?id=58494) instead
+
+> Make sure you place the connector in the correct users folder. If you are using OneDrive you may have two documents folder, but C:\Users\\*username*\Documents is the correct one.
+
 ## Connect to Azure Data Manager for Energy from Power Query Desktop
 
 To connect to **Azure Data Manager for Energy**
