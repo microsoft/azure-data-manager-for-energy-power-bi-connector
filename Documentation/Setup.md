@@ -35,9 +35,16 @@ description: Includes basic information, prerequisites, and information on how t
 
     4. Save your changes
 
+
 ## Power BI Capabilities supported
 
 * Import
+
+## Importing the Connector to Power BI
+
+1. Download the latest connector file (.mez) from [Releases](https://github.com/microsoft/azure-data-manager-for-energy-power-bi-connector/releases)
+
+2. Follow [Allow Uncertified Connectors in Power BI Desktop](https://learn.microsoft.com/power-bi/connect-data/desktop-connector-extensibility#custom-connectors)
 
 ## Connect to Azure Data Manager for Energy from Power Query Desktop
 
