@@ -54,7 +54,7 @@ To connect to **Azure Data Manager for Energy**
 
 2. Select **Azure** from the list of data categories.
 
-3. Select **Azure Data Manager for Energy (Beta)**.
+3. Select **Microsoft Azure Data Manager for Energy (Beta)**.
 
     ![Get data](./media/get-data.png)
 
