@@ -10,10 +10,23 @@ Follow [Setup](./Documentation/Setup.md) for steps on using the connector. For d
 
 ## Development Machine Setup
 
-You will need Visual Studio 2019 and the Power Query SDK to compile the project.
+1. Ensure you have [VSCode Installed]("https://code.visualstudio.com")
+   
+2. Go to the extensions menu option and search "Power Query SDK"
+   
+![ Install the Power Query SDK extension (from Microsoft)](./media/step1.png)
 
-1. Install Visual Studio 2019
-1. Install the [Power Query SDK](https://marketplace.visualstudio.com/items?itemName=Dakahn.PowerQuerySDK) from the Visual Studio Marketplace
+1. Install Extension
+2. Open the folder below in VSCode
+   ``` 
+   /MicrosoftAzureDataManagerForEnergy/MicrosoftAzureDataManagerForEnergy
+   ``````
+   ensuring you are in the sub-directory where the connector pq/.mproj files are located
+3. In the bottom right, a Power Query SDK mechanism will trigger after the project files are completed.  Click "Enable" to complete the SDK setup
+
+![Power Query Files Detected](./media/upgrade-suggestion.jpg)
+
+4. [Power Query SDK Quickstart](https://learn.microsoft.com/en-us/power-query/power-query-sdk-vs-code)
 
 ## Testing the Connector
 
