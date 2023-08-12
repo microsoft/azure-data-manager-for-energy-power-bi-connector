@@ -10,7 +10,7 @@ Follow [Setup](./Documentation/Setup.md) for steps on using the connector. For d
 
 ## Development Machine Setup
 
-1. Ensure you have [VSCode Installed]("https://code.visualstudio.com")
+1. Prequisites: VSCode
    
 2. Go to the extensions menu option and search "Power Query SDK"
    
