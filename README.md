@@ -16,13 +16,13 @@ Follow [Setup](./Documentation/Setup.md) for steps on using the connector. For d
    
 ![ Install the Power Query SDK extension (from Microsoft)](./Documentation/media/step1.png)
 
-1. Install Extension
-2. Open the folder below in VSCode
+3. Install Extension
+4. Open the folder below in VSCode
    ``` 
    /MicrosoftAzureDataManagerForEnergy/MicrosoftAzureDataManagerForEnergy
    ``````
    ensuring you are in the sub-directory where the connector pq/.mproj files are located
-3. In the bottom right, a Power Query SDK mechanism will trigger after the project files are completed.  Click "Enable" to complete the SDK setup
+5. In the bottom right, a Power Query SDK mechanism will trigger after the project files are completed.  Click "Enable" to complete the SDK setup
 
 ![Power Query Files Detected](./Documentation/media/upgrade-suggestion.jpg)
 
