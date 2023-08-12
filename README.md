@@ -14,7 +14,7 @@ Follow [Setup](./Documentation/Setup.md) for steps on using the connector. For d
    
 2. Go to the extensions menu option and search "Power Query SDK"
    
-![ Install the Power Query SDK extension (from Microsoft)](./Documentation/media/step1.jpg)
+![ Install the Power Query SDK extension (from Microsoft)](./Documentation/media/step1.png)
 
 1. Install Extension
 2. Open the folder below in VSCode
