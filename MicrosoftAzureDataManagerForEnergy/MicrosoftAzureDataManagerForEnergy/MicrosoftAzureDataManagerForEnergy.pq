@@ -12,16 +12,6 @@ pageSize = 100;
 shared MicrosoftAzureDataManagerForEnergy.Search = Value.ReplaceType(MicrosoftAzureDataManagerForEnergyImpl, MicrosoftAzureDataManagerForEnergyType);
 
 MicrosoftAzureDataManagerForEnergyType = type function (
-    clientId as (type text meta [
-        Documentation.FieldCaption = Extension.LoadString("clientIdFieldCaption"),
-        Documentation.FieldDescription = Extension.LoadString("clientIdFieldDescription"),
-        Documentation.SampleValues = {"fb82bc98-a537-4c2b-a4ed-cf7c53eed5f9"}
-    ]),
-    tenantId as (type text meta [
-        Documentation.FieldCaption = Extension.LoadString("tentantIdFieldCaption"),
-        Documentation.FieldDescription = Extension.LoadString("tenantIdFieldDescription"),
-        Documentation.SampleValues = {"4b12b551-b235-46b3-9f79-6a61adc75b6a"}
-    ]),
     serviceName as (type text meta [
         Documentation.FieldCaption = Extension.LoadString("serviceNameFieldCaption"),
         Documentation.FieldDescription = Extension.LoadString("serviceNameFieldDescription"),
@@ -42,6 +32,16 @@ MicrosoftAzureDataManagerForEnergyType = type function (
         Documentation.FieldDescription = Extension.LoadString("queryFieldDescription"),
         Documentation.SampleValues = {"*"}
     ]),
+        resourceId as (type text meta [
+        Documentation.FieldCaption = Extension.LoadString("TO DO"),
+        Documentation.FieldDescription = Extension.LoadString("TO DO"),
+        Documentation.SampleValues = {"https://<instance>.adme.energy.azure.com or fb82bc98-a537-4c2b-a4ed-cf7c53eed5f9"}
+    ]),
+    tenantId as (type text meta [
+        Documentation.FieldCaption = Extension.LoadString("tentantIdFieldCaption"),
+        Documentation.FieldDescription = Extension.LoadString("tenantIdFieldDescription"),
+        Documentation.SampleValues = {"mytenant.onmicrosoft.com OR 4b12b551-b235-46b3-9f79-6a61adc75b6a"}
+    ]),
     optional limit as (type number meta [
         Documentation.FieldCaption = Extension.LoadString("limitFieldCaption"),
         Documentation.FieldDescription = Extension.LoadString("limitFieldDescription"),
@@ -57,17 +57,18 @@ MicrosoftAzureDataManagerForEnergyType = type function (
         Documentation.LongDescription = Extension.LoadString("documentationLongDescription"),
         Documentation.Examples = {[
             Description = Extension.LoadString("exampleDescription"),
-            Code = "MicrosoftAzureDataManagerForEnergy.Search(""fb82bc98-a537-4c2b-a4ed-cf7c53eed5f9"", ""4b12b551-b235-46b3-9f79-6a61adc75b6a"", ""platform4321"", ""platform4321-opendes"", ""osdu:wks:master-data--Well:1.0.0"", ""*"", 2, null)",
+            Code = "MicrosoftAzureDataManagerForEnergy.Search(""platform4321"", ""opendes"", ""osdu:wks:master-data--Well:1.0.0"", ""*"", ""fb82bc98-a537-4c2b-a4ed-cf7c53eed5f9"", ""4b12b551-b235-46b3-9f79-6a61adc75b6a"", 2, null)",
             Result = Extension.LoadString("exampleResult")
         ]}
     ];
 
-MicrosoftAzureDataManagerForEnergyImpl = (clientId as text, 
-                                      tenantId as text, 
+MicrosoftAzureDataManagerForEnergyImpl = (
                                       serviceName as text, 
                                       dataPartition as text,
                                       kind as text, 
                                       query as text,
+                                      resourceId as text,
+                                      tenantId as text,
                                       optional limit as number, 
                                       optional returnedFields as text) =>
     let
@@ -200,24 +201,42 @@ AdjustPageSizeDependingOnUsersLimit = (runningCountOfRetrievedRecords as number,
     in
         adjustedLimit;
 
+GetAuthorizationUrl = (tenantId as text) as text => 
+    let
+        url = "https://login.microsoftonline.com/" & tenantId & "/.well-known/openid-configuration",
+        endpointresponse = Json.Document(Web.Contents(url, [])),
+        auth_url = endpointresponse[authorization_endpoint]
+    in
+        auth_url;
+
+AuthUri.IfNullOrEmpty = (tenantId) => if (tenantId <> null and tenantId <> "") then GetAuthorizationUrl(tenantId) else "https://login.microsoftonline.com/common/oauth2/authorize";
+Resource.IfNullOrEmpty = (resourceid) => if (resourceid <> null and resourceid <> "") then resourceid else "https://adme.energy.azure.com";
+
 MicrosoftAzureDataManagerForEnergy = [
     TestConnection = (dataSourcePath) =>
         let
             json = Json.Document(dataSourcePath),
-            clientId = json[clientId],
+            resourceId = json[resourceId],
             tenantId = json[tenantId],
             serviceName = json[serviceName],
             dataPartition = json[dataPartition],
             kind = json[kind],
             query = json[query]
         in
-            { "MicrosoftAzureDataManagerForEnergy.Search", clientId, tenantId, serviceName, dataPartition, kind, query },
+            { "MicrosoftAzureDataManagerForEnergy.Search", serviceName, dataPartition, kind, query, resourceId, tenantId },
     Authentication = [
-        OAuth = [
-            StartLogin=StartLogin,
-            FinishLogin=FinishLogin,
-            Refresh=Refresh,
-            Logout=Logout
+        Aad = [
+            //https://learn.microsoft.com/en-us/power-query/handling-authentication
+            //https://learn.microsoft.com/en-us/power-query/connector-authentication#supported-workflow
+            //Example 1: where ADME and resource are in different tenants AuthorizationUri = "https://login.microsoftonline.com/58975fd3-4977-44d0-bea8-37af0baac100/oauth2/authorize",
+            //Example 2: Default, ADME and resource are in the same tenant AuthorizationUri = (tenantId) => "https://login.microsoftonline.com/common/oauth2/authorize", //this one doesn't work with Azure B2B
+            AuthorizationUri = (dataSourcePath) => AuthUri.IfNullOrEmpty(Json.Document(dataSourcePath)[tenantId]), 
+            // AuthorizationUri = "https://login.microsoftonline.com/58975fd3-4977-44d0-bea8-37af0baac100/oauth2/authorize",
+            //Resource = "c0215339-ef86-4e34-a315-90509f761f4a"
+            //Resource = "https://<>.adme.energy.azure.com"
+            //In the installation documentation ask to create a app with id https://adme.energy.azure.com which works by default
+            //Otherwise provide the resource id which could be a Uri or a Guid
+            Resource = (dataSourcePath) => Resource.IfNullOrEmpty(Json.Document(dataSourcePath)[resourceId])
         ]
     ],
     Label = Extension.LoadString("dataSourceLabel")
@@ -271,74 +290,6 @@ GetAuthenticationBaseUrl = (queryParameters as text) as text =>
     in
         authenticationBaseUrl;
 
-StartLogin = (dataSourcePath, state, display) =>
-    let
-        clientId = GetClientId(dataSourcePath),
-        codeVerifier = Text.NewGuid() & Text.NewGuid(),
-        AuthorizeUrl = GetAuthenticationBaseUrl(dataSourcePath) & "/authorize?" & Uri.BuildQueryString([
-            client_id = clientId,
-            response_type = "code",
-            code_challenge_method = "S256",
-            code_challenge = CreateCodeChallenge(codeVerifier),
-            state = state,
-            scope = GetScopes(clientId),
-            redirect_uri = redirectUri])
-    in
-        [
-            LoginUri = AuthorizeUrl,
-            CallbackUri = redirectUri,
-            WindowHeight = 720,
-            WindowWidth = 1024,
-            Context = codeVerifier
-        ];
-
-FinishLogin = (clientApplication, dataSourcePath, context, callbackUri, state) =>
-    let
-        // parse the full callbackUri, and extract the Query string
-        parts = Uri.Parts(callbackUri)[Query],
-        // if the query string contains an "error" field, raise an error
-        // otherwise call TokenMethod to exchange our code for an access_token
-        result = if (Record.HasFields(parts, {"error", "error_description"})) then 
-                    error Error.Record(parts[error], parts[error_description], parts)
-                else
-                    TokenMethod(dataSourcePath, parts[code], "authorization_code", context)
-    in
-        result;
-
-Refresh = (resourceUrl, refresh_token) => TokenMethod(refresh_token, "refresh_token");
-
-Logout = (token) => logoutUri;
-
-TokenMethod = (dataSourcePath, code, grant_type, optional verifier) =>
-    let
-        codeVerifier = if (verifier <> null) then [code_verifier = verifier] else [],
-        codeParameter = if (grant_type = "authorization_code") then [ code = code ] else [ refresh_token = code ],
-        query = codeVerifier & codeParameter & [
-            client_id = GetClientId(dataSourcePath),
-            grant_type = grant_type,
-            redirect_uri = redirectUri
-        ],
- 
-        // Set this if your API returns a non-2xx status for login failures
-        ManualHandlingStatusCodes= {400},
-        
-        Response = Web.Contents(GetAuthenticationBaseUrl(dataSourcePath) & "/token", [
-            Content = Text.ToBinary(Uri.BuildQueryString(query)),
-            Headers = [
-                #"Content-type" = "application/x-www-form-urlencoded",
-                #"Accept" = "application/json",
-                #"Origin" = ""
-            ],
-            ManualStatusHandling = ManualHandlingStatusCodes
-        ]),
-        Parts = Json.Document(Response)
-    in
-        // check for error in response
-        if (Parts[error]? <> null) then 
-            error Error.Record(Parts[error], Parts[message]?)
-        else
-            Parts;
- 
 ValueNumber.IfNull = (a, b, fieldname) => if a <> null then ",""" & fieldname & """: " & Number.ToText(a) else b;
 
 ValueText.IfNullOrEmpty = (a, b, fieldname) => if (a <> null and a <> "") then  ",""" & fieldname & """: """ & a & """" else b;

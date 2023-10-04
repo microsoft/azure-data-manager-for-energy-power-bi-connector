@@ -123,12 +123,6 @@
   <data name="buttonTitle" xml:space="preserve">
     <value>Microsoft Azure Data Manager for Energy</value>
   </data>
-  <data name="clientIdFieldCaption" xml:space="preserve">
-    <value>Azure AD Application Client ID</value>
-  </data>
-  <data name="clientIdFieldDescription" xml:space="preserve">
-    <value>The ID of the Azure AD Application used to create the Microsoft Azure Data Manager for Energy instance</value>
-  </data>
   <data name="dataPartitionFieldCaption" xml:space="preserve">
     <value>Data Partition</value>
   </data>
@@ -173,6 +167,12 @@
   </data>
   <data name="queryFieldDescription" xml:space="preserve">
     <value>Query string based on Lucene query string syntax</value>
+  </data>
+  <data name="resourceIdFieldCaption" xml:space="preserve">
+    <value>Azure AD Application Client ID</value>
+  </data>
+  <data name="resourceIdFieldDescription" xml:space="preserve">
+    <value>The ID, or https://&lt;instance&gt;.adme.energy.azure.com, of the Azure AD Application used to create the Microsoft Azure Data Manager for Energy instance</value>
   </data>
   <data name="returnedFieldsFieldCaption" xml:space="preserve">
     <value>Returned Fields</value>
