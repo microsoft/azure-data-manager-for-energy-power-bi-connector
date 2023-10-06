@@ -37,11 +37,6 @@ MicrosoftAzureDataManagerForEnergyType = type function (
         Documentation.FieldDescription = Extension.LoadString("TO DO"),
         Documentation.SampleValues = {"https://<instance>.adme.energy.azure.com or fb82bc98-a537-4c2b-a4ed-cf7c53eed5f9"}
     ]),
-    tenantId as (type text meta [
-        Documentation.FieldCaption = Extension.LoadString("tentantIdFieldCaption"),
-        Documentation.FieldDescription = Extension.LoadString("tenantIdFieldDescription"),
-        Documentation.SampleValues = {"mytenant.onmicrosoft.com OR 4b12b551-b235-46b3-9f79-6a61adc75b6a"}
-    ]),
     optional limit as (type number meta [
         Documentation.FieldCaption = Extension.LoadString("limitFieldCaption"),
         Documentation.FieldDescription = Extension.LoadString("limitFieldDescription"),
@@ -68,7 +63,6 @@ MicrosoftAzureDataManagerForEnergyImpl = (
                                       kind as text, 
                                       query as text,
                                       resourceId as text,
-                                      tenantId as text,
                                       optional limit as number, 
                                       optional returnedFields as text) =>
     let
@@ -201,35 +195,6 @@ AdjustPageSizeDependingOnUsersLimit = (runningCountOfRetrievedRecords as number,
     in
         adjustedLimit;
 
-BuildAuthUrl = (tenantId as text) as text => 
-    let
-        url = "https://login.microsoftonline.com/" & tenantId & "/.well-known/openid-configuration",
-        endpointresponse = Json.Document(Web.Contents(url, [])),
-        auth_url = endpointresponse[authorization_endpoint]
-    in
-        auth_url;
-
-GetAuthUrl = (dataSourcePath as text) as text => 
-    let
-        //tenantId = Json.Document(dataSourcePath)[tenantId],
-        url =
-            if (IsTenantIdSet(dataSourcePath)) then 
-                BuildAuthUrl(Json.Document(dataSourcePath)[tenantId]) 
-            else 
-                "https://login.microsoftonline.com/common/oauth2/authorize"
-    in
-        url;
-
-IsTenantIdSet = (dataSourcePath as text) as logical => 
-    let
-        isSet = Text.Contains(dataSourcePath, "tenantId", Comparer.OrdinalIgnoreCase) and
-                Json.Document(dataSourcePath)[tenantId] <> null and 
-                Json.Document(dataSourcePath)[tenantId] <> ""
-    in
-        isSet;
-
-
-//AuthUri.IfNullOrEmpty = (tenantId) => if (tenantId <> null and tenantId <> "") then GetAuthorizationUrl(tenantId) else "https://login.microsoftonline.com/common/oauth2/authorize";
 Resource.IfNullOrEmpty = (resourceid) => if (resourceid <> null and resourceid <> "") then resourceid else "https://adme.energy.azure.com";
 
 MicrosoftAzureDataManagerForEnergy = [
@@ -237,26 +202,15 @@ MicrosoftAzureDataManagerForEnergy = [
         let
             json = Json.Document(dataSourcePath),
             resourceId = json[resourceId],
-            tenantId = json[tenantId],
             serviceName = json[serviceName],
             dataPartition = json[dataPartition],
             kind = json[kind],
             query = json[query]
         in
-            { "MicrosoftAzureDataManagerForEnergy.Search", serviceName, dataPartition, kind, query, resourceId, tenantId },
+            { "MicrosoftAzureDataManagerForEnergy.Search", serviceName, dataPartition, kind, query, resourceId },
     Authentication = [
         Aad = [
-            //https://learn.microsoft.com/en-us/power-query/handling-authentication
-            //https://learn.microsoft.com/en-us/power-query/connector-authentication#supported-workflow
-            //Example 1: where ADME and resource are in different tenants AuthorizationUri = "https://login.microsoftonline.com/58975fd3-4977-44d0-bea8-37af0baac100/oauth2/authorize",
-            //Example 2: Default, ADME and resource are in the same tenant AuthorizationUri = (tenantId) => "https://login.microsoftonline.com/common/oauth2/authorize", //this one doesn't work with Azure B2B
-            AuthorizationUri = (dataSourcePath) => GetAuthUrl(dataSourcePath),
-            //AuthorizationUri = (dataSourcePath) => try BuildAuthUrl(dataSourcePath) otherwise "https://login.microsoftonline.com/common/oauth2/authorize",
-            // AuthorizationUri = "https://login.microsoftonline.com/58975fd3-4977-44d0-bea8-37af0baac100/oauth2/authorize",
-            //Resource = "c0215339-ef86-4e34-a315-90509f761f4a"
-            //Resource = "https://<>.adme.energy.azure.com"
-            //In the installation documentation ask to create a app with id https://adme.energy.azure.com which works by default
-            //Otherwise provide the resource id which could be a Uri or a Guid
+            AuthorizationUri = (dataSourcePath) => "https://login.microsoftonline.com/common/oauth2/authorize",
             Resource = (dataSourcePath) => Resource.IfNullOrEmpty(Json.Document(dataSourcePath)[resourceId])
         ]
     ],
@@ -276,40 +230,6 @@ MicrosoftAzureDataManagerForEnergy.Icons = [
     Icon16 = { Extension.Contents("MicrosoftAzureDataManagerForEnergy16.png"), Extension.Contents("MicrosoftAzureDataManagerForEnergy20.png"), Extension.Contents("MicrosoftAzureDataManagerForEnergy24.png"), Extension.Contents("MicrosoftAzureDataManagerForEnergy32.png") },
     Icon32 = { Extension.Contents("MicrosoftAzureDataManagerForEnergy32.png"), Extension.Contents("MicrosoftAzureDataManagerForEnergy40.png"), Extension.Contents("MicrosoftAzureDataManagerForEnergy48.png"), Extension.Contents("MicrosoftAzureDataManagerForEnergy64.png") }
 ];
-
-Base64UrlEncode = (toConvert as binary) as text =>
-	let
-		encodedText = Binary.ToText(toConvert, BinaryEncoding.Base64)
-	in
-		Text.Remove(Text.Replace(Text.Replace(encodedText, "+", "-"), "/", "_"), "=");
-
-CreateCodeChallenge = (codeVerifier as text) as text => 
-    let 
-        encodedText = Text.ToBinary(codeVerifier, TextEncoding.Ascii),
-        challenge = Base64UrlEncode(Crypto.CreateHash(CryptoAlgorithm.SHA256, encodedText))
-    in
-        challenge;
-
-GetScopes = (clientId as text) as text =>
-    let
-        scopes = "openid profile offline_access " & clientId & "/.default"
-    in 
-        scopes;
-
-GetClientId = (queryParameters as text) as text => 
-    let
-        jsonQueryParameters = Json.Document(queryParameters),
-        clientId = jsonQueryParameters[clientId]        
-    in
-        clientId;
-
-GetAuthenticationBaseUrl = (queryParameters as text) as text => 
-    let 
-        jsonQueryParameters = Json.Document(queryParameters),
-        tenantId = jsonQueryParameters[tenantId],
-        authenticationBaseUrl = "https://login.microsoftonline.com/" & tenantId & "/oauth2/v2.0"
-    in
-        authenticationBaseUrl;
 
 ValueNumber.IfNull = (a, b, fieldname) => if a <> null then ",""" & fieldname & """: " & Number.ToText(a) else b;
 
