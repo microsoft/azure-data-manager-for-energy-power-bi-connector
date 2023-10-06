@@ -32,7 +32,7 @@ MicrosoftAzureDataManagerForEnergyType = type function (
         Documentation.FieldDescription = Extension.LoadString("queryFieldDescription"),
         Documentation.SampleValues = {"*"}
     ]),
-        resourceId as (type text meta [
+    resourceId as (type text meta [
         Documentation.FieldCaption = Extension.LoadString("TO DO"),
         Documentation.FieldDescription = Extension.LoadString("TO DO"),
         Documentation.SampleValues = {"https://<instance>.adme.energy.azure.com or fb82bc98-a537-4c2b-a4ed-cf7c53eed5f9"}
@@ -201,7 +201,7 @@ AdjustPageSizeDependingOnUsersLimit = (runningCountOfRetrievedRecords as number,
     in
         adjustedLimit;
 
-GetAuthorizationUrl = (tenantId as text) as text => 
+BuildAuthUrl = (tenantId as text) as text => 
     let
         url = "https://login.microsoftonline.com/" & tenantId & "/.well-known/openid-configuration",
         endpointresponse = Json.Document(Web.Contents(url, [])),
@@ -209,7 +209,27 @@ GetAuthorizationUrl = (tenantId as text) as text =>
     in
         auth_url;
 
-AuthUri.IfNullOrEmpty = (tenantId) => if (tenantId <> null and tenantId <> "") then GetAuthorizationUrl(tenantId) else "https://login.microsoftonline.com/common/oauth2/authorize";
+GetAuthUrl = (dataSourcePath as text) as text => 
+    let
+        //tenantId = Json.Document(dataSourcePath)[tenantId],
+        url =
+            if (IsTenantIdSet(dataSourcePath)) then 
+                BuildAuthUrl(Json.Document(dataSourcePath)[tenantId]) 
+            else 
+                "https://login.microsoftonline.com/common/oauth2/authorize"
+    in
+        url;
+
+IsTenantIdSet = (dataSourcePath as text) as logical => 
+    let
+        isSet = Text.Contains(dataSourcePath, "tenantId", Comparer.OrdinalIgnoreCase) and
+                Json.Document(dataSourcePath)[tenantId] <> null and 
+                Json.Document(dataSourcePath)[tenantId] <> ""
+    in
+        isSet;
+
+
+//AuthUri.IfNullOrEmpty = (tenantId) => if (tenantId <> null and tenantId <> "") then GetAuthorizationUrl(tenantId) else "https://login.microsoftonline.com/common/oauth2/authorize";
 Resource.IfNullOrEmpty = (resourceid) => if (resourceid <> null and resourceid <> "") then resourceid else "https://adme.energy.azure.com";
 
 MicrosoftAzureDataManagerForEnergy = [
@@ -230,7 +250,8 @@ MicrosoftAzureDataManagerForEnergy = [
             //https://learn.microsoft.com/en-us/power-query/connector-authentication#supported-workflow
             //Example 1: where ADME and resource are in different tenants AuthorizationUri = "https://login.microsoftonline.com/58975fd3-4977-44d0-bea8-37af0baac100/oauth2/authorize",
             //Example 2: Default, ADME and resource are in the same tenant AuthorizationUri = (tenantId) => "https://login.microsoftonline.com/common/oauth2/authorize", //this one doesn't work with Azure B2B
-            AuthorizationUri = (dataSourcePath) => AuthUri.IfNullOrEmpty(Json.Document(dataSourcePath)[tenantId]), 
+            AuthorizationUri = (dataSourcePath) => GetAuthUrl(dataSourcePath),
+            //AuthorizationUri = (dataSourcePath) => try BuildAuthUrl(dataSourcePath) otherwise "https://login.microsoftonline.com/common/oauth2/authorize",
             // AuthorizationUri = "https://login.microsoftonline.com/58975fd3-4977-44d0-bea8-37af0baac100/oauth2/authorize",
             //Resource = "c0215339-ef86-4e34-a315-90509f761f4a"
             //Resource = "https://<>.adme.energy.azure.com"

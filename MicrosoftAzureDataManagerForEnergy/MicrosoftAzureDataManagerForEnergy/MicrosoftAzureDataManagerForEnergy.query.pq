@@ -5,10 +5,12 @@
 section MicrosoftAzureDataManagerForEnergyTests;
 
 // Tests must be run against an instance that's completed a TNO data load: https://github.com/Azure/osdu-data-load-tno
-resourceId = "<resource id>";
-tenantId = "<tenant id>";
-instanceName = "<Microsoft Azure Data Manager for Energy instance name>";
-datapartition = "<data patition ID>";
+resourceId = "";
+resourceUrl = "";
+tenantId = "";
+teanantUrl = "";
+instanceName = "";
+datapartition = "";
 kind = "osdu:wks:master-data--Well:1.0.0";
 query = "*";
 
@@ -17,14 +19,30 @@ shared MicrosoftAzureDataManagerForEnergy.Test =
     // Fact(<Name of the Test>, <Expected Value>, <Actual Value>)
     facts = 
     {
-        Fact("Check that total record count is calculated when there is no limit",
+        Fact("Check that total record count is calculated when there is no limit and no tenantId is empty",
             4947,
             GetTotalCount(MicrosoftAzureDataManagerForEnergy.Search(instanceName,
                                          datapartition,
                                          kind,
                                          query,
                                          resourceId,
-                                         tenantId))),
+                                         ""))),
+        Fact("Check that total record count is calculated when there is no limit and a tenantURL is provided",
+             4947,
+             GetTotalCount(MicrosoftAzureDataManagerForEnergy.Search(instanceName,
+                                          datapartition,
+                                          kind,
+                                          query,
+                                          resourceId,
+                                          teanantUrl))),
+        Fact("Check that total record count is calculated when there is no limit",
+             4947,
+             GetTotalCount(MicrosoftAzureDataManagerForEnergy.Search(instanceName,
+                                          datapartition,
+                                          kind,
+                                          query,
+                                          resourceId,
+                                          tenantId))),
         Fact("Check that total record count is calculated there is a limit",
             4947,
             GetTotalCount(MicrosoftAzureDataManagerForEnergy.Search(instanceName,
