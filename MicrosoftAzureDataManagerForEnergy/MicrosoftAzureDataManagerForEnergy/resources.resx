@@ -172,7 +172,7 @@
     <value>Azure AD Application Client ID</value>
   </data>
   <data name="resourceIdFieldDescription" xml:space="preserve">
-    <value>The ID, or https://&lt;instance&gt;.adme.energy.azure.com, of the Azure AD Application used to create the Microsoft Azure Data Manager for Energy instance</value>
+    <value>The ID of the Azure AD Application used to create the Microsoft Azure Data Manager for Energy instance</value>
   </data>
   <data name="returnedFieldsFieldCaption" xml:space="preserve">
     <value>Returned Fields</value>
@@ -188,11 +188,5 @@
   </data>
   <data name="serviceNameSampleValues" xml:space="preserve">
     <value>platform4321</value>
-  </data>
-  <data name="tenantIdFieldDescription" xml:space="preserve">
-    <value>The ID of the Azure AD tenant the Azure AD Application belongs to</value>
-  </data>
-  <data name="tentantIdFieldCaption" xml:space="preserve">
-    <value>Azure AD Tenant ID</value>
   </data>
 </root>

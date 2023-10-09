@@ -22,6 +22,11 @@ MicrosoftAzureDataManagerForEnergyType = type function (
         Documentation.FieldDescription = Extension.LoadString("dataPartitionFieldDescription"),
         Documentation.SampleValues = {Extension.LoadString("dataPartitionSampleValues")}
     ]),
+    resourceId as (type text meta [
+        Documentation.FieldCaption = Extension.LoadString("resourceIdFieldCaption"),
+        Documentation.FieldDescription = Extension.LoadString("resourceIdFieldDescription"),
+        Documentation.SampleValues = {"fb82bc98-a537-4c2b-a4ed-cf7c53eed5f9"}
+    ]),
     kind as (type text meta [
         Documentation.FieldCaption = Extension.LoadString("kindFieldCaption"),
         Documentation.FieldDescription = Extension.LoadString("kindFieldDescription"),
@@ -31,11 +36,6 @@ MicrosoftAzureDataManagerForEnergyType = type function (
         Documentation.FieldCaption = Extension.LoadString("queryFieldCaption"),
         Documentation.FieldDescription = Extension.LoadString("queryFieldDescription"),
         Documentation.SampleValues = {"*"}
-    ]),
-    resourceId as (type text meta [
-        Documentation.FieldCaption = Extension.LoadString("TO DO"),
-        Documentation.FieldDescription = Extension.LoadString("TO DO"),
-        Documentation.SampleValues = {"https://<instance>.adme.energy.azure.com or fb82bc98-a537-4c2b-a4ed-cf7c53eed5f9"}
     ]),
     optional limit as (type number meta [
         Documentation.FieldCaption = Extension.LoadString("limitFieldCaption"),
@@ -52,7 +52,7 @@ MicrosoftAzureDataManagerForEnergyType = type function (
         Documentation.LongDescription = Extension.LoadString("documentationLongDescription"),
         Documentation.Examples = {[
             Description = Extension.LoadString("exampleDescription"),
-            Code = "MicrosoftAzureDataManagerForEnergy.Search(""platform4321"", ""opendes"", ""osdu:wks:master-data--Well:1.0.0"", ""*"", ""fb82bc98-a537-4c2b-a4ed-cf7c53eed5f9"", ""4b12b551-b235-46b3-9f79-6a61adc75b6a"", 2, null)",
+            Code = "MicrosoftAzureDataManagerForEnergy.Search(""platform4321"", ""opendes"", ""fb82bc98-a537-4c2b-a4ed-cf7c53eed5f9"", ""osdu:wks:master-data--Well:1.0.0"", ""*"", 2, null)",
             Result = Extension.LoadString("exampleResult")
         ]}
     ];
@@ -60,9 +60,9 @@ MicrosoftAzureDataManagerForEnergyType = type function (
 MicrosoftAzureDataManagerForEnergyImpl = (
                                       serviceName as text, 
                                       dataPartition as text,
+                                      resourceId as text,
                                       kind as text, 
                                       query as text,
-                                      resourceId as text,
                                       optional limit as number, 
                                       optional returnedFields as text) =>
     let
@@ -195,8 +195,6 @@ AdjustPageSizeDependingOnUsersLimit = (runningCountOfRetrievedRecords as number,
     in
         adjustedLimit;
 
-Resource.IfNullOrEmpty = (resourceid) => if (resourceid <> null and resourceid <> "") then resourceid else "https://adme.energy.azure.com";
-
 MicrosoftAzureDataManagerForEnergy = [
     TestConnection = (dataSourcePath) =>
         let
@@ -207,11 +205,11 @@ MicrosoftAzureDataManagerForEnergy = [
             kind = json[kind],
             query = json[query]
         in
-            { "MicrosoftAzureDataManagerForEnergy.Search", serviceName, dataPartition, kind, query, resourceId },
+            { "MicrosoftAzureDataManagerForEnergy.Search", serviceName, dataPartition, resourceId, kind, query },
     Authentication = [
         Aad = [
             AuthorizationUri = (dataSourcePath) => "https://login.microsoftonline.com/common/oauth2/authorize",
-            Resource = (dataSourcePath) => Resource.IfNullOrEmpty(Json.Document(dataSourcePath)[resourceId])
+            Resource = (dataSourcePath) => Json.Document(dataSourcePath)[resourceId]
         ]
     ],
     Label = Extension.LoadString("dataSourceLabel")
